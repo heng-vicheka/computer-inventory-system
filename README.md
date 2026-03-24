@@ -1,6 +1,6 @@
 # Computer Inventory System
 
-## 1) Project Setup (Clone -> Install)
+## 1) Project Setup
 
 ### Prerequisites
 
@@ -26,7 +26,7 @@ pnpm install
 pnpm prepare
 ```
 
-## 2) Task Execution Workflow (GitHub Issue -> Branch -> Commit)
+## 2) Task Execution Workflow
 
 ### Step 1: Start from a GitHub issue
 
