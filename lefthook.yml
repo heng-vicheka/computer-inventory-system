@@ -1,0 +1,26 @@
+pre-commit:
+  parallel: true
+  commands:
+    # prettier
+    prettier:
+      run: pnpm lint:prettier
+
+    # eslint
+    eslint:
+      run: pnpm lint
+
+    #cspell
+    cspell:
+      run: pnpm lint:spell
+
+    # audit
+    audit:
+      run: pnpm audit --audit-level=low
+
+pre-push:
+  commands:
+    # packages audit:
+    #   run: pnpm audit --audit-level=low
+
+    # gems audit:
+    #   run: bundle audit

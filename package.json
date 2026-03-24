@@ -1,0 +1,46 @@
+{
+	"name": "computer-inventory-system",
+	"version": "1.0.0",
+	"description": "",
+	"homepage": "https://github.com/heng-vicheka/computer-inventory-system#readme",
+	"bugs": {
+		"url": "https://github.com/heng-vicheka/computer-inventory-system/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/heng-vicheka/computer-inventory-system.git"
+	},
+	"license": "",
+	"author": "Seng Mouyheang, Heng Vicheka, Heng Chanpheakdey",
+	"type": "module",
+	"main": "server.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "vite",
+		"nodemon": "nodemon app.js",
+		"build": "vite build",
+		"lint": "eslint .",
+		"lint:prettier": "prettier --check .",
+		"lint:spell": "cspell .",
+		"format": "prettier --write .",
+		"prepare": "lefthook install",
+		"precommit": "lefthook run pre-commit",
+		"prepush": "lefthook run pre-push",
+		"update:latest": "npm i pnpm@latest"
+	},
+	"devDependencies": {
+		"@eslint/compat": "^2.0.3",
+		"@eslint/js": "^10.0.1",
+		"cspell": "^9.7.0",
+		"eslint": "^10.1.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-prettier": "^5.5.5",
+		"globals": "^17.4.0",
+		"lefthook": "^2.1.4",
+		"nodemon": "^3.1.14",
+		"path": "^0.12.7",
+		"pnpm": "^10.32.1",
+		"prettier": "^3.8.1",
+		"vite": "^8.0.1"
+	}
+}

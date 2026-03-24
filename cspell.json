@@ -1,0 +1,17 @@
+{
+	"version": "0.2",
+	"language": "en",
+	"words": ["devops", "seng", "mouyheang", "heng", "vicheka", "chanpheakdey"],
+	"ignorePaths": [
+		"cspell.json",
+		"node_modules",
+		"pnpm-lock.yaml",
+		"package-lock.json",
+		"package.json",
+		"dist",
+		"build",
+		"*.log",
+		"lefthook.yml",
+		".git/*"
+	]
+}
