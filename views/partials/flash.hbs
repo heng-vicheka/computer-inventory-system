@@ -1,0 +1,9 @@
+{{#if flash}}
+<div class="alert alert-{{flash.type}} alert-dismissible fade show" role="alert">
+	<i
+		class="bi bi-{{#if (eq flash.type 'success')}}check-circle{{else if (eq flash.type 'danger')}}x-circle{{else}}info-circle{{/if}} me-2"
+	></i>
+	{{flash.message}}
+	<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{{/if}}

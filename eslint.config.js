@@ -3,6 +3,9 @@ import prettier from 'eslint-config-prettier'
 import globals from 'globals'
 
 export default [
+	// Ignore non-JS files
+	{ ignores: ['views/**/*.hbs'] },
+
 	// JavaScript recommended rules
 	js.configs.recommended,
 

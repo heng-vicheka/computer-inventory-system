@@ -1,0 +1,101 @@
+<div class="row justify-content-center">
+	<div class="col-lg-7">
+		<div class="d-flex align-items-center gap-2 mb-4">
+			<a href="/items/{{item._id}}" class="btn btn-sm btn-outline-secondary">
+				<i class="bi bi-arrow-left"></i>
+			</a>
+			<h2 class="fw-bold mb-0">Edit Item</h2>
+		</div>
+
+		<div class="card border-0 shadow-sm">
+			<div class="card-body p-4">
+				<form action="/items/{{item._id}}?_method=PUT" method="POST" novalidate>
+					<div class="row g-3">
+						<div class="col-sm-6">
+							<label for="brand" class="form-label fw-semibold">Brand <span class="text-danger">*</span></label>
+							<input
+								type="text"
+								id="brand"
+								name="brand"
+								class="form-control"
+								value="{{item.brand}}"
+								required
+							/>
+						</div>
+
+						<div class="col-sm-6">
+							<label for="model" class="form-label fw-semibold">Model <span class="text-danger">*</span></label>
+							<input
+								type="text"
+								id="model"
+								name="model"
+								class="form-control"
+								value="{{item.model}}"
+								required
+							/>
+						</div>
+
+						<div class="col-sm-6">
+							<label for="serialNumber" class="form-label fw-semibold">Serial Number <span class="text-danger">*</span></label>
+							<input
+								type="text"
+								id="serialNumber"
+								name="serialNumber"
+								class="form-control"
+								value="{{item.serialNumber}}"
+								required
+							/>
+						</div>
+
+						<div class="col-sm-6">
+							<label for="category" class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+							<select id="category" name="category" class="form-select" required>
+								<optgroup label="Computers">
+									<option value="Laptop" {{#if (eq item.category 'Laptop')}}selected{{/if}}>Laptop</option>
+									<option value="Desktop" {{#if (eq item.category 'Desktop')}}selected{{/if}}>Desktop</option>
+									<option value="Server" {{#if (eq item.category 'Server')}}selected{{/if}}>Server</option>
+								</optgroup>
+								<optgroup label="Peripherals">
+									<option value="Monitor" {{#if (eq item.category 'Monitor')}}selected{{/if}}>Monitor</option>
+									<option value="Keyboard" {{#if (eq item.category 'Keyboard')}}selected{{/if}}>Keyboard</option>
+									<option value="Mouse" {{#if (eq item.category 'Mouse')}}selected{{/if}}>Mouse</option>
+									<option value="Printer" {{#if (eq item.category 'Printer')}}selected{{/if}}>Printer</option>
+									<option value="Other" {{#if (eq item.category 'Other')}}selected{{/if}}>Other</option>
+								</optgroup>
+							</select>
+						</div>
+
+						<div class="col-sm-6">
+							<label for="status" class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
+							<select id="status" name="status" class="form-select" required>
+								<option value="Available" {{#if (eq item.status 'Available')}}selected{{/if}}>Available</option>
+								<option value="In-Use" {{#if (eq item.status 'In-Use')}}selected{{/if}}>In-Use</option>
+								<option value="Maintenance" {{#if (eq item.status 'Maintenance')}}selected{{/if}}>Maintenance</option>
+								<option value="Retired" {{#if (eq item.status 'Retired')}}selected{{/if}}>Retired</option>
+							</select>
+						</div>
+
+						<div class="col-sm-6">
+							<label for="dateAcquired" class="form-label fw-semibold">Date Acquired <span class="text-danger">*</span></label>
+							<input
+								type="date"
+								id="dateAcquired"
+								name="dateAcquired"
+								class="form-control"
+								value="{{item.dateAcquiredValue}}"
+								required
+							/>
+						</div>
+
+						<div class="col-12 d-flex justify-content-end gap-2 pt-2">
+							<a href="/items/{{item._id}}" class="btn btn-outline-secondary">Cancel</a>
+							<button type="submit" class="btn btn-primary">
+								<i class="bi bi-floppy me-1"></i>Save Changes
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

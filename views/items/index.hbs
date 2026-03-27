@@ -1,0 +1,129 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+	<div>
+		<h2 class="fw-bold mb-0">Inventory</h2>
+		<p class="text-muted mb-0">{{totalItems}} items total</p>
+	</div>
+	<a href="/items/new" class="btn btn-primary">
+		<i class="bi bi-plus-circle me-1"></i>Add Item
+	</a>
+</div>
+
+<!-- Filters -->
+<div class="card border-0 shadow-sm mb-4">
+	<div class="card-body">
+		<form method="GET" action="/items" class="row g-2 align-items-end">
+			<div class="col-sm-4">
+				<label class="form-label small fw-semibold">Search</label>
+				<input
+					type="text"
+					name="q"
+					value="{{filters.q}}"
+					class="form-control"
+					placeholder="Model, brand, serial…"
+				/>
+			</div>
+			<div class="col-sm-3">
+				<label class="form-label small fw-semibold">Category</label>
+				<select name="category" class="form-select">
+					<option value="">All Categories</option>
+					<option value="Laptop" {{#if (eq filters.category 'Laptop')}}selected{{/if}}>Laptop</option>
+					<option value="Desktop" {{#if (eq filters.category 'Desktop')}}selected{{/if}}>Desktop</option>
+					<option value="Server" {{#if (eq filters.category 'Server')}}selected{{/if}}>Server</option>
+					<option value="Monitor" {{#if (eq filters.category 'Monitor')}}selected{{/if}}>Monitor</option>
+					<option
+						value="Keyboard"
+						{{#if (eq filters.category 'Keyboard')}}selected{{/if}}
+					>Keyboard</option>
+					<option value="Other" {{#if (eq filters.category 'Other')}}selected{{/if}}>Other</option>
+				</select>
+			</div>
+			<div class="col-sm-3">
+				<label class="form-label small fw-semibold">Status</label>
+				<select name="status" class="form-select">
+					<option value="">All Statuses</option>
+					<option
+						value="Available"
+						{{#if (eq filters.status 'Available')}}selected{{/if}}
+					>Available</option>
+					<option
+						value="In-Use"
+						{{#if (eq filters.status 'In-Use')}}selected{{/if}}
+					>In-Use</option>
+					<option
+						value="Maintenance"
+						{{#if (eq filters.status 'Maintenance')}}selected{{/if}}
+					>Maintenance</option>
+					<option
+						value="Retired"
+						{{#if (eq filters.status 'Retired')}}selected{{/if}}
+					>Retired</option>
+				</select>
+			</div>
+			<div class="col-sm-2 d-flex gap-2">
+				<button type="submit" class="btn btn-dark flex-fill">
+					<i class="bi bi-funnel me-1"></i>Filter
+				</button>
+				<a href="/items" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></a>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Table -->
+<div class="card border-0 shadow-sm">
+	<div class="table-responsive">
+		<table class="table table-hover align-middle mb-0">
+			<thead class="table-dark">
+				<tr>
+					<th>Item ID</th>
+					<th>Brand / Model</th>
+					<th>Category</th>
+					<th>Serial No.</th>
+					<th>Status</th>
+					<th>Date Acquired</th>
+					<th class="text-end">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#each items}}
+				<tr>
+					<td class="font-monospace small">{{this.itemId}}</td>
+					<td>
+						<div class="fw-semibold">{{this.brand}}</div>
+						<div class="text-muted small">{{this.model}}</div>
+					</td>
+					<td>{{this.category}}</td>
+					<td class="font-monospace small">{{this.serialNumber}}</td>
+					<td>
+						<span class="badge bg-{{statusBadge this.status}}">{{this.status}}</span>
+					</td>
+					<td class="small">{{formatDate this.dateAcquired}}</td>
+					<td class="text-end">
+						<div class="btn-group btn-group-sm">
+							<a href="/items/{{this._id}}" class="btn btn-outline-secondary" title="View">
+								<i class="bi bi-eye"></i>
+							</a>
+							<a href="/items/{{this._id}}/edit" class="btn btn-outline-primary" title="Edit">
+								<i class="bi bi-pencil"></i>
+							</a>
+							<a
+								href="/items/{{this._id}}/history"
+								class="btn btn-outline-info"
+								title="History"
+							>
+								<i class="bi bi-clock-history"></i>
+							</a>
+						</div>
+					</td>
+				</tr>
+				{{else}}
+				<tr>
+					<td colspan="7" class="text-center text-muted py-5">
+						<i class="bi bi-inbox fs-2 d-block mb-2"></i>No items found
+					</td>
+				</tr>
+				{{/each}}
+			</tbody>
+		</table>
+	</div>
+</div>
