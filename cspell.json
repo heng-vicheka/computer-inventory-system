@@ -1,11 +1,23 @@
 {
 	"version": "0.2",
 	"language": "en",
-	"words": ["devops", "seng", "mouyheang", "heng", "vicheka", "chanpheakdey", "prepush"],
+	"words": [
+		"devops",
+		"seng",
+		"mouyheang",
+		"heng",
+		"vicheka",
+		"chanpheakdey",
+		"prepush",
+		"turso",
+		"TURSO",
+		"libsql"
+	],
 	"ignorePaths": [
 		"cspell.json",
 		"node_modules",
 		"pnpm-lock.yaml",
+		"pnpm-workspace.yaml",
 		"package-lock.json",
 		"package.json",
 		"dist",
