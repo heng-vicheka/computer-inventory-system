@@ -53,4 +53,9 @@ app.set('views', join(__dirname, 'views'))
 // ─── Static Assets (for CSS/JS used by views) ────────────────────────────────
 app.use(express.static(join(__dirname, 'public')))
 
+// ─── Routes ──────────────────────────────────────────────────────────────────
+app.get('/', (_req, res) => {
+	res.render('home')
+})
+
 export default app
