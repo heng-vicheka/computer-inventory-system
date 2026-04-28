@@ -3,6 +3,20 @@ import prettier from 'eslint-config-prettier'
 import globals from 'globals'
 
 export default [
+	{
+		ignores: [
+			'node_modules/**',
+			'build/**',
+			'dist/**',
+			'coverage/**',
+			'public/**',
+			'views/**',
+			'.env',
+			'.env.*',
+			'*.log',
+		],
+	},
+
 	// JavaScript recommended rules
 	js.configs.recommended,
 
