@@ -21,6 +21,7 @@ export const users = sqliteTable('users', {
 		.references(() => userRoles.id),
 
 	status: text('status').notNull(),
+	profilePictureUrl: text('profile_picture_url'),
 	dateCreated: text('date_created')
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull(),
@@ -86,6 +87,8 @@ export const devices = sqliteTable('devices', {
 	deviceCategoryId: integer('device_category_id')
 		.notNull()
 		.references(() => deviceCategories.id),
+
+	devicePictureUrl: text('device_picture_url'),
 
 	modelName: text('model_name'),
 	dateAcquired: text('date_acquired'),
