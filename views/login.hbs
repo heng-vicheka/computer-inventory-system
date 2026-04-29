@@ -21,10 +21,17 @@
   .form-group.full { grid-column: 1/-1; }
   label { font-size: 13px; color: var(--color-text-secondary); }
   .form-group input, .form-group select, .form-group textarea { padding: 9px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); font-size: 14px; color: var(--color-text-primary); }
+  .field-error { display: none; color: #D1242F; font-size: 12px; margin-top: 6px; line-height: 1.4; }
+  .input-error { border-color: #D1242F !important; }
+  .password-field { position: relative; }
+  .password-field input { width: 100%; padding-right: 68px; }
+  .password-toggle { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: 0; background: transparent; color: #185FA5; font-size: 12px; font-weight: 600; cursor: pointer; padding: 4px 6px; }
   .form-actions { padding: 12px 16px; border-top: 0.5px solid var(--color-border-tertiary); display: flex; gap: 8px; justify-content: flex-start; }
   .btn { padding: 8px 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; cursor: pointer; font-size: 14px; color: var(--color-text-primary); }
   .btn-primary { background: #185FA5; border-color: #185FA5; color: #E6F1FB; }
-  .empty { padding: 12px 16px; color: var(--color-text-secondary); font-size: 13px; }
+  .auth-link { text-align: center; margin-top: 12px; font-size: 13px; color: var(--color-text-secondary); }
+  .auth-link a { color: #185FA5; text-decoration: none; font-weight: 500; }
+  .auth-link a:hover { text-decoration: underline; }
 
   /* Responsive adjustments */
   @media (max-width: 700px){
@@ -47,24 +54,36 @@
       </div>
     </div>
 
-    <form method="POST" action="/login">
+    <form method="POST" action="/login" id="loginForm" novalidate>
+      {{#if errors}}
+        <div class="field-error" style="display:block; margin-bottom: 12px;">
+          {{#each errors}}
+            <div>{{this}}</div>
+          {{/each}}
+        </div>
+      {{/if}}
       <div class="form-grid" style="grid-template-columns: 1fr; gap: 16px;">
         <div class="form-group full">
           <label for="role">Role</label>
           <select id="role" name="role">
-            <option value="user">Normal User</option>
-            <option value="admin">Admin</option>
+            <option value="user" {{#eq role "user"}}selected{{/eq}}>Normal User</option>
+            <option value="admin" {{#eq role "admin"}}selected{{/eq}}>Admin</option>
           </select>
         </div>
 
         <div class="form-group">
           <label for="email">Email</label>
-          <input id="email" type="email" name="email" placeholder="user@example.com" required />
+          <input id="email" type="email" name="email" placeholder="user@example.com" value="{{email}}" />
+          <div id="emailError" class="field-error">{{emailError}}</div>
         </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input id="password" type="password" name="password" placeholder="Enter password" required />
+          <div class="password-field">
+            <input id="password" type="password" name="password" placeholder="Enter password" />
+            <button type="button" class="password-toggle" data-password-toggle="password" aria-label="Show password">Show</button>
+          </div>
+          <div id="passwordError" class="field-error">{{passwordError}}</div>
         </div>
       </div>
 
@@ -72,9 +91,72 @@
         <button type="submit" class="btn btn-primary">Sign in</button>
       </div>
     </form>
-
-    <div class="empty" style="margin-top: 8px;">
-      Choose a role and sign in to access the full inventory system.
-    </div>
   </div>
 </div>
+
+<div class="auth-link">
+  Don't have an account? <a href="/signup">Sign up</a>
+</div>
+
+<script>
+  const emailError = document.getElementById('emailError')
+  const passwordError = document.getElementById('passwordError')
+
+  function clearFieldError(element) {
+    if (!element) return
+    element.textContent = ''
+    element.style.display = 'none'
+    const input = document.getElementById(element.id.replace('Error', ''))
+    if (input) input.classList.remove('input-error')
+  }
+
+  function setFieldError(element, message) {
+    if (!element) return
+    if (!message) {
+      clearFieldError(element)
+      return
+    }
+    element.textContent = message
+    element.style.display = 'block'
+    const input = document.getElementById(element.id.replace('Error', ''))
+    if (input) input.classList.add('input-error')
+  }
+
+  document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const input = document.getElementById(button.dataset.passwordToggle)
+      const isPassword = input.type === 'password'
+
+      input.type = isPassword ? 'text' : 'password'
+      button.textContent = isPassword ? 'Hide' : 'Show'
+      button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password')
+    })
+  })
+
+  document.getElementById('email').addEventListener('input', () => clearFieldError(emailError))
+  document.getElementById('password').addEventListener('input', () => clearFieldError(passwordError))
+
+  document.getElementById('loginForm').addEventListener('submit', (e) => {
+    let hasError = false
+    const email = document.getElementById('email').value.trim()
+    const password = document.getElementById('password').value
+
+    clearFieldError(emailError)
+    clearFieldError(passwordError)
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!email || !emailPattern.test(email)) {
+      setFieldError(emailError, 'Please enter a valid email address.')
+      hasError = true
+    }
+
+    if (!password) {
+      setFieldError(passwordError, 'Password is required.')
+      hasError = true
+    }
+
+    if (hasError) {
+      e.preventDefault()
+    }
+  })
+</script>

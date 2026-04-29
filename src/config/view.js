@@ -24,7 +24,12 @@ function isAuthenticated(req) {
 }
 
 function authMiddleware(req, res, next) {
-	if (req.path === '/login' || req.path === '/logout') {
+	if (
+		req.path === '/login' ||
+		req.path === '/logout' ||
+		req.path === '/signup' ||
+		req.path.startsWith('/verify-email')
+	) {
 		return next()
 	}
 
