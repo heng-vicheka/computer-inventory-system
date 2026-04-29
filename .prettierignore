@@ -1,7 +1,9 @@
 .gitignore
 .env
 .env.example
+computer_inventory_system_ui.html
 criteria.md
+criteria-checklist.md
 node_modules/
 package-lock.json
 pnpm-lock.yaml
