@@ -1,0 +1,244 @@
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    --color-text-primary: #22272A;
+    --color-text-secondary: #55606A;
+    --color-background-primary: #FFFFFF;
+    --color-background-secondary: #F7F9FB;
+    --color-border-secondary: #E6EDF6;
+    --color-border-tertiary: #E8EEF6;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+  }
+  body { font-family: var(--font-sans); font-size: 14px; color: var(--color-text-primary); background: var(--color-background-primary); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  .content { padding: 20px; }
+  .section { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 16px; box-shadow: 0 1px 0 rgba(0,0,0,0.02); }
+  .section-header { padding: 12px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: space-between; }
+  .section-title { font-size: 15px; font-weight: 600; color: var(--color-text-primary); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1/-1; }
+  label { font-size: 13px; color: var(--color-text-secondary); }
+  .form-group input, .form-group select, .form-group textarea { padding: 9px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); font-size: 14px; color: var(--color-text-primary); }
+  .password-field { position: relative; }
+  .password-field input { width: 100%; padding-right: 68px; }
+  .password-toggle { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: 0; background: transparent; color: #185FA5; font-size: 12px; font-weight: 600; cursor: pointer; padding: 4px 6px; }
+  .form-actions { padding: 12px 16px; border-top: 0.5px solid var(--color-border-tertiary); display: flex; gap: 8px; justify-content: flex-start; }
+  .btn { padding: 8px 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; cursor: pointer; font-size: 14px; color: var(--color-text-primary); }
+  .btn-primary { background: #185FA5; border-color: #185FA5; color: #E6F1FB; }
+  .auth-link { text-align: center; margin-top: 8px; }
+  .auth-link { text-align: center; margin-top: 12px; font-size: 13px; color: var(--color-text-secondary); }
+  .auth-link a { color: #185FA5; text-decoration: none; font-weight: 500; }
+  .auth-link a:hover { text-decoration: underline; }
+  .field-error { display: none; color: #D1242F; font-size: 12px; margin-top: 6px; line-height: 1.4; }
+  .field-error ul { margin: 6px 0 0 18px; padding: 0; }
+  .field-error li { margin: 4px 0; }
+  .input-error { border-color: #D1242F !important; }
+  .field-error li { margin: 4px 0; }
+  .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 16px; background: #2DA44E; color: white; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; display: none; animation: slideIn 0.3s ease-out; }
+  .toast.show { display: block; }
+  @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  /* Responsive adjustments */
+  @media (max-width: 700px){
+    .form-grid { grid-template-columns: 1fr; padding: 14px; }
+    .section { margin: 12px; }
+  }
+  @media (max-width:420px){
+    .section { border-radius: 10px; }
+    .form-group input, .form-group select { padding: 10px; font-size: 16px; }
+    .section-title { font-size: 14px; }
+  }
+</style>
+
+<div style="min-height: calc(100vh - 80px); display:flex; align-items:center; justify-content:center; padding: 20px; background: var(--color-background-primary);">
+  <div class="section" style="max-width: 520px; width: 100%;">
+    <div class="section-header" style="justify-content: center; padding: 24px 16px;">
+      <div style="text-align: center;">
+        <img src="/assets/bitbin-logo.png" alt="BitBin IT Inventory" style="width: 80px; height: 80px; margin-bottom: 16px;" />
+        <span class="section-title">Create Your Account</span>
+      </div>
+    </div>
+
+    {{#if errors}}
+      <div style="padding: 12px 16px; background: #FFEBE6; margin: 12px 16px; border-radius: 4px; color: #D1242F; font-size: 13px;">
+        {{#each errors}}
+          <div>{{this}}</div>
+        {{/each}}
+      </div>
+    {{/if}}
+
+    <form method="POST" action="/signup" id="signupForm" novalidate>
+      <div class="form-grid" style="grid-template-columns: 1fr; gap: 16px;">
+        <div class="form-group full">
+          <label for="role">Role</label>
+          <select id="role" name="role" required>
+            <option value="" selected>Select a role</option>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input id="email" type="email" name="email" placeholder="user@example.com" required />
+          <div id="emailError" class="field-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-field">
+            <input id="password" type="password" name="password" placeholder="Enter password" required />
+            <button type="button" class="password-toggle" data-password-toggle="password" aria-label="Show password">Show</button>
+          </div>
+          <div id="passwordError" class="field-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="passwordConfirm">Confirm Password</label>
+          <div class="password-field">
+            <input id="passwordConfirm" type="password" name="passwordConfirm" placeholder="Confirm password" required />
+            <button type="button" class="password-toggle" data-password-toggle="passwordConfirm" aria-label="Show password confirmation">Show</button>
+          </div>
+          <div id="passwordConfirmError" class="field-error"></div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Sign up</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="auth-link">
+  Already have an account? <a href="/login">Sign in</a>
+</div>
+
+<div class="toast" id="successToast">Account created! Check your email to verify your account.</div>
+
+<script>
+  const passwordError = document.getElementById('passwordError');
+  const passwordConfirmError = document.getElementById('passwordConfirmError');
+
+  document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const input = document.getElementById(button.dataset.passwordToggle)
+      const isPassword = input.type === 'password'
+
+      input.type = isPassword ? 'text' : 'password'
+      button.textContent = isPassword ? 'Hide' : 'Show'
+      button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password')
+    })
+  })
+
+  function validatePassword(password) {
+    const requirements = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      special: /[!@#$%^&*]/.test(password),
+    };
+    return requirements;
+  }
+
+  function getUnmetRequirements(password) {
+    const reqs = validatePassword(password);
+    const unmet = [];
+
+    if (!reqs.length) unmet.push('At least 8 characters');
+    if (!reqs.uppercase) unmet.push('At least one uppercase letter (A-Z)');
+    if (!reqs.lowercase) unmet.push('At least one lowercase letter (a-z)');
+    if (!reqs.number) unmet.push('At least one number (0-9)');
+    if (!reqs.special) unmet.push('At least one special character (!@#$%^&*)');
+
+    return unmet;
+  }
+
+  function setFieldError(element, messages) {
+    if (!element) return;
+    const input = document.getElementById(element.id.replace('Error', ''));
+    if (!messages || messages.length === 0) {
+      element.style.display = 'none';
+      element.innerHTML = '';
+      if (input) input.classList.remove('input-error');
+      return;
+    }
+
+    if (messages.length === 1) {
+      element.innerHTML = messages[0];
+    } else {
+      element.innerHTML = `<ul>${messages.map((msg) => `<li>${msg}</li>`).join('')}</ul>`;
+    }
+
+    element.style.display = 'block';
+    if (input) input.classList.add('input-error');
+  }
+
+  const emailError = document.getElementById('emailError');
+  document.getElementById('email').addEventListener('input', () => setFieldError(emailError, []));
+  document.getElementById('password').addEventListener('input', () => {
+    setFieldError(passwordError, []);
+    setFieldError(passwordConfirmError, []);
+  });
+
+  document.getElementById('passwordConfirm').addEventListener('input', () => {
+    setFieldError(passwordConfirmError, []);
+  });
+
+  document.getElementById('signupForm').addEventListener('submit', (e) => {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('passwordConfirm').value;
+    const emailErrors = [];
+    const passwordErrors = [];
+    const confirmErrors = [];
+
+    setFieldError(emailError, []);
+    setFieldError(passwordError, []);
+    setFieldError(passwordConfirmError, []);
+
+    if (!email) {
+      emailErrors.push('Email is required.');
+    } else {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(email)) {
+        emailErrors.push('Please enter a valid email address.');
+      }
+    }
+
+    if (!password) {
+      passwordErrors.push('Password is required.');
+    }
+
+    if (!passwordConfirm) {
+      confirmErrors.push('Confirmation password is required.');
+    }
+
+    const unmetRequirements = getUnmetRequirements(password);
+    if (password && unmetRequirements.length > 0) {
+      passwordErrors.push(...unmetRequirements);
+    }
+
+    if (password && passwordConfirm && password !== passwordConfirm) {
+      confirmErrors.push('Passwords do not match');
+    }
+
+    if (emailErrors.length > 0) {
+      e.preventDefault();
+      setFieldError(emailError, emailErrors);
+    }
+
+    if (passwordErrors.length > 0) {
+      e.preventDefault();
+      setFieldError(passwordError, passwordErrors);
+    }
+
+    if (confirmErrors.length > 0) {
+      e.preventDefault();
+      setFieldError(passwordConfirmError, confirmErrors);
+    }
+  });
+</script>
