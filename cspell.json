@@ -6,14 +6,16 @@
 		"checkin",
 		"devops",
 		"heng",
+		"Liant",
 		"libsql",
 		"mouyheang",
+		"OptiPlex",
 		"prepush",
 		"seng",
+		"topbar",
 		"turso",
 		"TURSO",
-		"vicheka",
-		"OptiPlex"
+		"vicheka"
 	],
 	"ignorePaths": [
 		"cspell.json",
