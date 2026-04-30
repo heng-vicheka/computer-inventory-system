@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { getItems, createDevice } from '../controllers/inventory.controller.js'
 
 const apiRouter = Router()
 
@@ -20,9 +21,9 @@ apiRouter.post('/keys', notImplemented)
 apiRouter.get('/keys', notImplemented)
 apiRouter.delete('/keys/:id', notImplemented)
 
-apiRouter.get('/items', notImplemented)
+apiRouter.get('/items', getItems)
 apiRouter.get('/items/:id/history', notImplemented)
-apiRouter.post('/items', notImplemented)
+apiRouter.post('/items', createDevice)
 apiRouter.put('/items/:id', notImplemented)
 apiRouter.delete('/items/:id', notImplemented)
 

@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import express from 'express'
 import app from './src/config/view.js'
 import corsMiddleware from './src/config/cors.js'
 import rateLimitMiddleware from './src/config/rateLimit.js'
@@ -11,6 +12,7 @@ app.disable('x-powered-by')
 app.use(auditLogger)
 app.use(corsMiddleware)
 app.use(rateLimitMiddleware)
+app.use(express.json())
 
 app.use('/api', apiRouter)
 app.use('/', clientRouter)

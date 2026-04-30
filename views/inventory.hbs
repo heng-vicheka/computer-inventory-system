@@ -69,16 +69,16 @@
 			</div>
 			<div class="form-grid">
 				<div class="form-group">
-					<label>Serial number</label><input type="text" placeholder="SN-XXXX" />
+					<label>Serial number</label><input id="new-serial" type="text" placeholder="SN-XXXX" />
 				</div>
 				<div class="form-group">
-					<label>Model</label><input type="text" placeholder="e.g. XPS 15" />
+					<label>Model</label><input id="new-model" type="text" placeholder="e.g. XPS 15" />
 				</div>
 				<div class="form-group">
-					<label>Brand</label><input type="text" placeholder="e.g. Dell" />
+					<label>Brand</label><input id="new-brand" type="text" placeholder="e.g. Dell" />
 				</div>
 				<div class="form-group">
-					<label>Category</label><select>
+					<label>Category</label><select id="new-category">
 						<option>Laptop</option>
 						<option>Desktop</option>
 						<option>Server</option>
@@ -88,7 +88,7 @@
 					</select>
 				</div>
 				<div class="form-group">
-					<label>Status</label><select>
+					<label>Status</label><select id="new-status">
 						<option>Available</option>
 						<option>In-Use</option>
 						<option>Maintenance</option>
@@ -96,7 +96,7 @@
 					</select>
 				</div>
 				<div class="form-group">
-					<label>Date acquired</label><input type="date" />
+					<label>Date acquired</label><input id="new-acquired" type="date" />
 				</div>
 				<div class="form-group full">
 					<label>Device image</label>
@@ -108,18 +108,37 @@
 				</div>
 			</div>
 			<div class="form-actions">
-				<button class="btn" onclick="closeModal()">Cancel</button>
-				<button class="btn btn-primary">Save item</button>
+				<button type="button" class="btn" onclick="closeModal()">Cancel</button>
+				<button type="button" class="btn btn-primary" id="save-device-btn">Save item</button>
 			</div>
 		</div>
 	</div>
 
 <script>
+	const defaultImageUrl = '/images/device-placeholder.svg'
+	let selectedDeviceImage = ''
+
 	function openModal() {
+		resetNewDeviceForm()
 		document.getElementById('modal').classList.add('open')
 	}
+
 	function closeModal() {
 		document.getElementById('modal').classList.remove('open')
+	}
+
+	function resetNewDeviceForm() {
+		document.getElementById('new-serial').value = ''
+		document.getElementById('new-model').value = ''
+		document.getElementById('new-brand').value = ''
+		document.getElementById('new-category').value = 'Laptop'
+		document.getElementById('new-status').value = 'Available'
+		document.getElementById('new-acquired').value = ''
+		document.getElementById('device-image-input').value = ''
+		selectedDeviceImage = ''
+		const preview = document.getElementById('device-image-preview')
+		preview.hidden = true
+		preview.src = ''
 	}
 
 	document.getElementById('device-image-input')?.addEventListener('change', function () {
@@ -127,6 +146,7 @@
 		const file = this.files && this.files[0]
 
 		if (!file) {
+			selectedDeviceImage = ''
 			preview.hidden = true
 			preview.src = ''
 			return
@@ -134,10 +154,56 @@
 
 		const reader = new FileReader()
 		reader.onload = function (event) {
-			preview.src = event.target.result
+			selectedDeviceImage = event.target.result
+			preview.src = selectedDeviceImage
 			preview.hidden = false
 		}
 		reader.readAsDataURL(file)
+	})
+
+	document.getElementById('save-device-btn')?.addEventListener('click', async function () {
+		const serialNumber = document.getElementById('new-serial').value.trim()
+		const modelName = document.getElementById('new-model').value.trim()
+		const brand = document.getElementById('new-brand').value.trim()
+		const category = document.getElementById('new-category').value
+		const status = document.getElementById('new-status').value
+		const dateAcquired = document.getElementById('new-acquired').value
+
+		if (!serialNumber || !modelName || !brand) {
+			alert('Please fill in serial number, model, and brand before saving.')
+			return
+		}
+
+		const payload = {
+			serialNumber,
+			modelName,
+			brand,
+			type: category,
+			category,
+			status,
+			dateAcquired,
+			pictureUrl: selectedDeviceImage || '',
+		}
+
+		try {
+			const response = await fetch('/api/items', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(payload),
+			})
+
+			if (!response.ok) {
+				const error = await response.json().catch(() => null)
+				throw new Error(error?.message || 'Unable to save device.')
+			}
+
+			closeModal()
+			window.location.reload()
+		} catch (error) {
+			alert(error.message)
+		}
 	})
 
 	document.getElementById('modal')?.addEventListener('click', function (e) {
