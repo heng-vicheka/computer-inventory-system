@@ -138,7 +138,7 @@ body {
 
 .stats-grid {
 	display: grid;
-	grid-template-columns: repeat(5, 1fr);
+	grid-template-columns: repeat(4, 1fr);
 	gap: 12px;
 	margin-bottom: 16px;
 }
@@ -182,9 +182,45 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
 }
 .card-body {
 	padding: 12px 16px;
+}
+.card-title {
+	font-size: 13px;
+	font-weight: 600;
+}
+.search-box {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+.form-input {
+	padding: 5px 10px;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 8px;
+	background: #f5f5f3;
+	font-size: 13px;
+	color: #1a1a1a;
+	width: 180px;
+}
+.form-input::placeholder {
+	color: #999;
+}
+.asset-label {
+	padding: 8px 0;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+	font-size: 12px;
+	color: #666;
+}
+.link-primary {
+	color: #378add;
+	text-decoration: none;
+}
+.link-primary:hover {
+	text-decoration: underline;
 }
 
 .activity-row {
@@ -244,6 +280,14 @@ tr:last-child td {
 }
 .btn-secondary {
 	background: transparent;
+}
+.btn-accent {
+	color: #777777;
+}
+.btn-accent:hover {
+	color: black;
+	background: #e3e3e3;
+	border: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 /* Modal */
