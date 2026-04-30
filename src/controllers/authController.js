@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import bcrypt from 'bcrypt'
+// import bcrypt from 'bcrypt'
 import nodemailer from 'nodemailer'
 
 // Email transporter setup
@@ -105,11 +105,11 @@ export async function handleSignup(req, res) {
 		// For now, just continue with signup process
 
 		// Hash password
-		const hashedPassword = await bcrypt.hash(password, 10)
+		// const hashedPassword = await bcrypt.hash(password, 10)
 
 		// Generate verification token
 		const verificationToken = crypto.randomBytes(32).toString('hex')
-		const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+		// const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
 
 		// TODO: Save user to database with:
 		// - email, hashedPassword, role, status: 'pending_verification'
@@ -144,8 +144,8 @@ export async function handleSignup(req, res) {
 				'Account created! Check your email to verify your account. You will be redirected to login in 3 seconds.',
 			title: 'Sign Up',
 		})
-	} catch (error) {
-		console.error('Signup error:', error)
+	} catch {
+		// console.error('Signup error:', error)
 		return res.render('signup', {
 			errors: ['An error occurred during signup. Please try again.'],
 			title: 'Sign Up',
@@ -155,7 +155,7 @@ export async function handleSignup(req, res) {
 
 export async function handleVerifyEmail(req, res) {
 	try {
-		const { token } = req.params
+		// const { token } = req.params
 
 		// TODO: Find user by verification token
 		// TODO: Check if token is expired
@@ -164,8 +164,8 @@ export async function handleVerifyEmail(req, res) {
 
 		// For now, just redirect to login
 		res.redirect('/login?verified=true')
-	} catch (error) {
-		console.error('Verification error:', error)
+	} catch {
+		// console.error('Verification error:', error)
 		res.render('email-verification-error', {
 			error: 'An error occurred during email verification. Please try again.',
 		})
