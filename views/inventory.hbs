@@ -1,0 +1,146 @@
+<div class="section">
+	<div class="section-header">
+		<span class="section-title">All items</span>
+		<div class="search-bar">
+			<input type="text" placeholder="Search..." />
+			<select>
+				<option>All categories</option>
+				<option>Laptop</option>
+				<option>Desktop</option>
+				<option>Monitor</option>
+				<option>Keyboard</option>
+				<option>Server</option>
+			</select>
+			<select>
+				<option>All statuses</option>
+				<option>Available</option>
+				<option>In-Use</option>
+				<option>Maintenance</option>
+				<option>Retired</option>
+			</select>
+				<button type="button" class="btn btn-primary" onclick="openModal()">+ Add item</button>
+		</div>
+	</div>
+	<table>
+		<thead>
+			<tr>
+				<th>Serial #</th>
+				<th></th>
+				<th>Model</th>
+				<th>Brand</th>
+				<th>Category</th>
+				<th>Status</th>
+				<th>Acquired</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#if devices.length}}
+				{{#each devices}}
+					<tr>
+						<td>{{serialNumber}}</td>
+						<td><img class="table-thumb" src="{{pictureUrl}}" alt="{{modelName}}" /></td>
+						<td>{{modelName}}</td>
+						<td>{{brand}}</td>
+						<td>{{category}}</td>
+						<td><span class="badge {{statusClass}}">{{status}}</span></td>
+						<td>{{formatDate dateAcquired}}</td>
+						<td>
+							<div class="action-buttons">
+								<button class="btn btn-secondary btn-sm">Edit</button>
+								<button class="btn btn-danger btn-sm">Delete</button>
+							</div>
+						</td>
+					</tr>
+				{{/each}}
+			{{else}}
+				<tr>
+					<td colspan="8" class="empty">No inventory items found.</td>
+				</tr>
+			{{/if}}
+		</tbody>
+	</table>
+	</div>
+	<div class="modal-overlay" id="modal">
+		<div class="modal">
+			<div class="modal-header">
+				<span style="font-size: 14px; font-weight: 500">Add new item</span>
+				<span class="modal-close" onclick="closeModal()">&#x2715;</span>
+			</div>
+			<div class="form-grid">
+				<div class="form-group">
+					<label>Serial number</label><input type="text" placeholder="SN-XXXX" />
+				</div>
+				<div class="form-group">
+					<label>Model</label><input type="text" placeholder="e.g. XPS 15" />
+				</div>
+				<div class="form-group">
+					<label>Brand</label><input type="text" placeholder="e.g. Dell" />
+				</div>
+				<div class="form-group">
+					<label>Category</label><select>
+						<option>Laptop</option>
+						<option>Desktop</option>
+						<option>Server</option>
+						<option>Monitor</option>
+						<option>Keyboard</option>
+						<option>Other</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>Status</label><select>
+						<option>Available</option>
+						<option>In-Use</option>
+						<option>Maintenance</option>
+						<option>Retired</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>Date acquired</label><input type="date" />
+				</div>
+				<div class="form-group full">
+					<label>Device image</label>
+					<div class="image-input">
+						<label class="btn" for="device-image-input">Select image</label>
+						<input id="device-image-input" type="file" accept="image/*" />
+						<img id="device-image-preview" class="image-preview" src="" alt="Device preview" hidden />
+					</div>
+				</div>
+			</div>
+			<div class="form-actions">
+				<button class="btn" onclick="closeModal()">Cancel</button>
+				<button class="btn btn-primary">Save item</button>
+			</div>
+		</div>
+	</div>
+
+<script>
+	function openModal() {
+		document.getElementById('modal').classList.add('open')
+	}
+	function closeModal() {
+		document.getElementById('modal').classList.remove('open')
+	}
+
+	document.getElementById('device-image-input')?.addEventListener('change', function () {
+		const preview = document.getElementById('device-image-preview')
+		const file = this.files && this.files[0]
+
+		if (!file) {
+			preview.hidden = true
+			preview.src = ''
+			return
+		}
+
+		const reader = new FileReader()
+		reader.onload = function (event) {
+			preview.src = event.target.result
+			preview.hidden = false
+		}
+		reader.readAsDataURL(file)
+	})
+
+	document.getElementById('modal')?.addEventListener('click', function (e) {
+		if (e.target === this) closeModal()
+	})
+</script>

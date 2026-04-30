@@ -24,6 +24,7 @@
 		"pnpm-workspace.yaml",
 		"package-lock.json",
 		"package.json",
+		"public",
 		"dist",
 		"build",
 		"*.log",

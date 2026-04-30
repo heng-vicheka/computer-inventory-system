@@ -1,37 +1,37 @@
 <nav class="sidebar">
     <div class="sidebar-header">💻 IT Inventory</div>
     <ul>
-        <li class="nav-item active" onclick="showPanel('dashboard', this)">
+        <li class="nav-item {{#if (eq currentPath '/dashboard')}}active{{/if}}">
             <a href="/dashboard" class="nav-link">
                 <span class="nav-icon">■</span> Dashboard
             </a>
         </li>
-        <li class="nav-item" onclick="showPanel('inventory', this)">
+        <li class="nav-item {{#if (eq currentPath '/inventory')}}active{{/if}}">
             <a href="/inventory" class="nav-link">
                 <span class="nav-icon">■</span> Inventory
             </a>
         </li>
-        <li class="nav-item" onclick="showPanel('checkout', this)">
+        <li class="nav-item {{#if (eq currentPath '/checkout')}}active{{/if}}">
             <a href="/checkout" class="nav-link">
                 <span class="nav-icon">■</span> Check-in / Out
             </a>
         </li>
-        <li class="nav-item" onclick="showPanel('history', this)">
+        <li class="nav-item {{#if (eq currentPath '/history')}}active{{/if}}">
             <a href="/history" class="nav-link">
                 <span class="nav-icon">■</span> Asset History
             </a>
         </li>
-        <li class="nav-item" onclick="showPanel('users', this)">
+        <li class="nav-item {{#if (eq currentPath '/users')}}active{{/if}}">
             <a href="/users" class="nav-link">
                 <span class="nav-icon">■</span> Users
             </a>
         </li>
-        <li class="nav-item" onclick="showPanel('apikeys', this)">
+        <li class="nav-item {{#if (eq currentPath '/apikeys')}}active{{/if}}">
             <a href="/apikeys" class="nav-link">
                 <span class="nav-icon">■</span> API Keys
             </a>
         </li>
-        <li class="nav-item" onclick="showPanel('reports', this)">
+        <li class="nav-item {{#if (eq currentPath '/reports')}}active{{/if}}">
             <a href="/reports" class="nav-link">
                 <span class="nav-icon">■</span> Reports
             </a>
