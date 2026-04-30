@@ -1,4 +1,4 @@
-{
+3{
 	"version": "0.2",
 	"language": "en",
 	"words": [
@@ -16,7 +16,8 @@
 		"turso",
 		"TURSO",
 		"Uploadthing",
-		"vicheka"
+		"vicheka",
+		"inuse"
 	],
 	"ignorePaths": [
 		"cspell.json",

@@ -1,0 +1,77 @@
+<div id="panel-history" class="panel block">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title" style="margin-top: auto; margin-bottom: auto;">Asset history</span>
+      <form class="search-box" method="GET" action="/history">
+        <input
+          type="text"
+          name="search"
+          placeholder="Search by serial #..."
+          class="form-input"
+          value="{{searchQuery}}"
+        />
+        <button type="submit" class="btn btn-primary" style="padding: 0.4rem 0.75rem; font-size: 0.75rem;">Search</button>
+        {{#if searchQuery}}
+          <a href="/history" class="btn btn-accent" style="padding: 0.4rem 0.75rem; font-size: 0.75rem;">Clear</a>
+        {{/if}}
+      </form>
+    </div>
+    <div class="card-body">
+      {{#if (isEmpty groupedHistory)}}
+        <div class="muted" style="text-align: center; padding: 2rem;">
+          {{#if searchQuery}}
+            No history found for serial number "{{searchQuery}}"
+          {{else}}
+            No history records found
+          {{/if}}
+        </div>
+      {{else}}
+        {{#each groupedHistory}}
+          <div style="margin-bottom: 1.5rem;">
+            <div class="asset-label">{{@key}}</div>
+            {{#each this}}
+              {{#if this.dateCheckedOutFormatted}}
+                <div class="activity-row">
+                  <div class="activity-dot bg-blue"></div>
+                  <div>
+                    <div>
+                      <strong>Checked out</strong> to {{this.userName}}
+                    </div>
+                    <div class="muted">
+                      {{this.dateCheckedInFormatted}}
+                    </div>
+                  </div>
+                </div>
+              {{/if}}
+              {{#if this.dateCheckedOutFormatted}}
+                <div class="activity-row">
+                  <div class="activity-dot bg-green"></div>
+                  <div>
+                    <div>
+                      <strong>Checked in</strong> from {{this.userName}}
+                    </div>
+                    <div class="muted">
+                      {{this.dateCheckedOutFormatted}} · Duration: {{this.duration}}
+                    </div>
+                  </div>
+                </div>
+              {{else}}
+                <div class="activity-row">
+                  <div class="activity-dot bg-blue"></div>
+                  <div>
+                    <div>
+                      <strong>Checked out</strong> to {{this.userName}}
+                    </div>
+                    <div class="muted">
+                      {{this.dateCheckedInFormatted}} · Duration: {{this.duration}}
+                    </div>
+                  </div>
+                </div>
+              {{/if}}
+            {{/each}}
+          </div>
+        {{/each}}
+      {{/if}}
+    </div>
+  </div>
+</div>
