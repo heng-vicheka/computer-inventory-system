@@ -8,9 +8,7 @@
 			<div class="card-body p-4 d-flex flex-column">
 				<h6 class="fw-semibold mb-4">Check out an item</h6>
 
-				<div id="checkout-alert"></div>
-
-				<form id="checkout-form" class="d-flex flex-column flex-grow-1">
+				<form method="POST" action="/transactions/checkout" class="d-flex flex-column flex-grow-1">
 					<div class="mb-3">
 						<label class="form-label text-muted small mb-1">Item (serial #)</label>
 						{{#if availableDevices}}
@@ -59,9 +57,7 @@
 			<div class="card-body p-4 d-flex flex-column">
 				<h6 class="fw-semibold mb-4">Check in an item</h6>
 
-				<div id="checkin-alert"></div>
-
-				<form id="checkin-form" class="d-flex flex-column flex-grow-1">
+				<form method="POST" action="/transactions/checkin" class="d-flex flex-column flex-grow-1">
 					<div class="mb-3">
 						<label class="form-label text-muted small mb-1">Item (serial #)</label>
 						{{#if activeCheckouts}}
@@ -103,67 +99,12 @@
 </div>
 
 <script>
-	const checkinSelect = document.getElementById('checkinSelect')
-	const returnedBy = document.getElementById('returnedBy')
-	if (checkinSelect) {
-		checkinSelect.addEventListener('change', () => {
-			const opt = checkinSelect.options[checkinSelect.selectedIndex]
-			returnedBy.value = opt.dataset.user || ''
+	const sel = document.getElementById('checkinSelect')
+	const field = document.getElementById('returnedBy')
+	if (sel) {
+		sel.addEventListener('change', () => {
+			const opt = sel.options[sel.selectedIndex]
+			field.value = opt.dataset.user || ''
 		})
 	}
-
-	function showAlert(containerId, type, message) {
-		const el = document.getElementById(containerId)
-		el.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show py-2 small" role="alert">
-			${message}
-			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>`
-	}
-
-	document.getElementById('checkout-form').addEventListener('submit', async (e) => {
-		e.preventDefault()
-		const form = e.target
-		const deviceId = form.querySelector('[name="deviceId"]')?.value
-		const userId = form.querySelector('[name="userId"]')?.value
-
-		try {
-			const res = await fetch('/api/transactions/checkout', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ deviceId: Number(deviceId), userId: Number(userId) }),
-			})
-			const data = await res.json()
-			if (!res.ok) {
-				showAlert('checkout-alert', 'danger', data.error || 'Checkout failed.')
-			} else {
-				showAlert('checkout-alert', 'success', 'Device checked out successfully.')
-				setTimeout(() => location.reload(), 1000)
-			}
-		} catch {
-			showAlert('checkout-alert', 'danger', 'Network error. Please try again.')
-		}
-	})
-
-	document.getElementById('checkin-form').addEventListener('submit', async (e) => {
-		e.preventDefault()
-		const form = e.target
-		const historyId = form.querySelector('[name="historyId"]')?.value
-
-		try {
-			const res = await fetch('/api/transactions/checkin', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ historyId: Number(historyId) }),
-			})
-			const data = await res.json()
-			if (!res.ok) {
-				showAlert('checkin-alert', 'danger', data.error || 'Check-in failed.')
-			} else {
-				showAlert('checkin-alert', 'success', 'Device checked in successfully.')
-				setTimeout(() => location.reload(), 1000)
-			}
-		} catch {
-			showAlert('checkin-alert', 'danger', 'Network error. Please try again.')
-		}
-	})
 </script>
