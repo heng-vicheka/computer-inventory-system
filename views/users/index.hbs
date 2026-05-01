@@ -1,7 +1,38 @@
+{{!-- Stat cards (mirrors dashboard.hbs pattern) --}}
+<div class="row g-3 mb-4">
+	<div class="col-sm-6 col-xl-3">
+		<div class="card border-0 shadow-sm h-100">
+			<div class="card-body">
+				<div class="text-muted small mb-1">Total users</div>
+				<div class="fs-3 fw-bold text-primary">{{stats.total}}</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6 col-xl-3">
+		<div class="card border-0 shadow-sm h-100">
+			<div class="card-body">
+				<div class="text-muted small mb-1">Active</div>
+				<div class="fs-3 fw-bold text-success">{{stats.active}}</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6 col-xl-3">
+		<div class="card border-0 shadow-sm h-100">
+			<div class="card-body">
+				<div class="text-muted small mb-1">Inactive</div>
+				<div class="fs-3 fw-bold text-warning">{{stats.inactive}}</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{{!-- User accounts table --}}
 <div class="card border-0 shadow-sm">
 	<div class="card-body px-4 pt-4 pb-0 d-flex justify-content-between align-items-center">
 		<span class="fw-semibold">User accounts</span>
-		<a href="/users/new" class="btn btn-sm text-white px-3" style="background:#2d4b8e">+ Create user</a>
+		<a href="/users/new" class="btn btn-sm text-white px-3" style="background:#2d4b8e">
+			<i class="bi bi-person-plus me-1"></i>Create user
+		</a>
 	</div>
 
 	<div class="table-responsive">
@@ -33,7 +64,7 @@
 						</span>
 						{{else}}
 						<span style="background:#fdecea;color:#c62828;border-radius:20px;padding:3px 12px;font-size:.8rem;font-weight:500">
-							Disabled
+							Inactive
 						</span>
 						{{/if}}
 					</td>
@@ -47,7 +78,10 @@
 				</tr>
 				{{else}}
 				<tr>
-					<td colspan="6" class="text-center text-muted py-5 px-4">No users found.</td>
+					<td colspan="6" class="text-center text-muted py-5 px-4">
+						<i class="bi bi-people fs-4 d-block mb-2"></i>
+						No users found.
+					</td>
 				</tr>
 				{{/each}}
 			</tbody>

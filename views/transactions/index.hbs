@@ -1,3 +1,32 @@
+{{!-- Stat cards (mirrors dashboard.hbs pattern) --}}
+<div class="row g-3 mb-4">
+	<div class="col-sm-6 col-xl-3">
+		<div class="card border-0 shadow-sm h-100">
+			<div class="card-body">
+				<div class="text-muted small mb-1">Available devices</div>
+				<div class="fs-3 fw-bold text-success">{{stats.available}}</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6 col-xl-3">
+		<div class="card border-0 shadow-sm h-100">
+			<div class="card-body">
+				<div class="text-muted small mb-1">Active checkouts</div>
+				<div class="fs-3 fw-bold text-warning">{{stats.checkedOut}}</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6 col-xl-3">
+		<div class="card border-0 shadow-sm h-100">
+			<div class="card-body">
+				<div class="text-muted small mb-1">Active users</div>
+				<div class="fs-3 fw-bold text-primary">{{stats.activeUsers}}</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{{!-- Check-in / Check-out forms --}}
 <div class="row g-4">
 
 	{{!-- Check Out --}}
@@ -16,7 +45,7 @@
 							<option value="">Select item…</option>
 							{{#each availableDevices}}
 							<option value="{{this.id}}">
-								{{this.serial_number}} — {{this.model_name}} (Available)
+								{{this.serial_number}} — {{this.model_name}}
 							</option>
 							{{/each}}
 						</select>
@@ -27,12 +56,16 @@
 
 					<div class="mb-3">
 						<label class="form-label text-muted small mb-1">Assign to user</label>
+						{{#if users}}
 						<select name="userId" class="form-select form-select-sm" required>
 							<option value="">Select user…</option>
 							{{#each users}}
 							<option value="{{this.id}}">{{this.name}}</option>
 							{{/each}}
 						</select>
+						{{else}}
+						<div class="form-control form-control-sm text-muted bg-light">No active users</div>
+						{{/if}}
 					</div>
 
 					<div class="mb-4">
@@ -42,8 +75,9 @@
 
 					<div class="mt-auto text-end">
 						<button type="submit" class="btn btn-sm px-4 text-white"
-								style="background:#2d4b8e" {{#unless availableDevices}}disabled{{/unless}}>
-							Check out
+								style="background:#2d4b8e"
+								{{#unless availableDevices}}disabled{{/unless}}>
+							<i class="bi bi-box-arrow-up-right me-1"></i>Check out
 						</button>
 					</div>
 				</form>
@@ -89,8 +123,9 @@
 
 					<div class="mt-auto text-end">
 						<button type="submit" class="btn btn-sm px-4 text-white"
-								style="background:#2d4b8e" {{#unless activeCheckouts}}disabled{{/unless}}>
-							Check in
+								style="background:#2d4b8e"
+								{{#unless activeCheckouts}}disabled{{/unless}}>
+							<i class="bi bi-box-arrow-in-down-left me-1"></i>Check in
 						</button>
 					</div>
 				</form>
@@ -123,7 +158,12 @@
 		const form = e.target
 		const deviceId = form.querySelector('[name="deviceId"]')?.value
 		const userId = form.querySelector('[name="userId"]')?.value
-
+		if (!deviceId || !userId) {
+			showAlert('checkout-alert', 'danger', 'Please select both a device and a user.')
+			return
+		}
+		const btn = form.querySelector('[type="submit"]')
+		btn.disabled = true
 		try {
 			const res = await fetch('/api/transactions/checkout', {
 				method: 'POST',
@@ -133,12 +173,14 @@
 			const data = await res.json()
 			if (!res.ok) {
 				showAlert('checkout-alert', 'danger', data.error || 'Checkout failed.')
+				btn.disabled = false
 			} else {
 				showAlert('checkout-alert', 'success', 'Device checked out successfully.')
 				setTimeout(() => location.reload(), 1000)
 			}
 		} catch {
 			showAlert('checkout-alert', 'danger', 'Network error. Please try again.')
+			btn.disabled = false
 		}
 	})
 
@@ -146,7 +188,12 @@
 		e.preventDefault()
 		const form = e.target
 		const historyId = form.querySelector('[name="historyId"]')?.value
-
+		if (!historyId) {
+			showAlert('checkin-alert', 'danger', 'Please select an item to check in.')
+			return
+		}
+		const btn = form.querySelector('[type="submit"]')
+		btn.disabled = true
 		try {
 			const res = await fetch('/api/transactions/checkin', {
 				method: 'POST',
@@ -156,12 +203,14 @@
 			const data = await res.json()
 			if (!res.ok) {
 				showAlert('checkin-alert', 'danger', data.error || 'Check-in failed.')
+				btn.disabled = false
 			} else {
 				showAlert('checkin-alert', 'success', 'Device checked in successfully.')
 				setTimeout(() => location.reload(), 1000)
 			}
 		} catch {
 			showAlert('checkin-alert', 'danger', 'Network error. Please try again.')
+			btn.disabled = false
 		}
 	})
 </script>
