@@ -7,11 +7,16 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const logsDirPath = join(__dirname, '..', '..', 'logs')
-mkdirSync(logsDirPath, { recursive: true })
+let auditLogger
 
-const auditLogPath = join(logsDirPath, 'audit.log')
-const auditLogStream = createWriteStream(auditLogPath, { flags: 'a' })
-
-const auditLogger = morgan('combined', { stream: auditLogStream })
+if (process.env.VERCEL === '1') {
+	// Vercel Functions use read-only filesystem outside /tmp.
+	auditLogger = morgan('combined')
+} else {
+	mkdirSync(logsDirPath, { recursive: true })
+	const auditLogPath = join(logsDirPath, 'audit.log')
+	const auditLogStream = createWriteStream(auditLogPath, { flags: 'a' })
+	auditLogger = morgan('combined', { stream: auditLogStream })
+}
 
 export default auditLogger
