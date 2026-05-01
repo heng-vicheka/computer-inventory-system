@@ -1,0 +1,110 @@
+{{> flash}}
+
+<div class="row g-4">
+
+	{{!-- Check Out --}}
+	<div class="col-md-6">
+		<div class="card border-0 shadow-sm h-100">
+			<div class="card-body p-4 d-flex flex-column">
+				<h6 class="fw-semibold mb-4">Check out an item</h6>
+
+				<form method="POST" action="/transactions/checkout" class="d-flex flex-column flex-grow-1">
+					<div class="mb-3">
+						<label class="form-label text-muted small mb-1">Item (serial #)</label>
+						{{#if availableDevices}}
+						<select name="deviceId" class="form-select form-select-sm" required>
+							<option value="">Select item…</option>
+							{{#each availableDevices}}
+							<option value="{{this.id}}">
+								{{this.serial_number}} — {{this.model_name}} (Available)
+							</option>
+							{{/each}}
+						</select>
+						{{else}}
+						<div class="form-control form-control-sm text-muted bg-light">No available devices</div>
+						{{/if}}
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label text-muted small mb-1">Assign to user</label>
+						<select name="userId" class="form-select form-select-sm" required>
+							<option value="">Select user…</option>
+							{{#each users}}
+							<option value="{{this.id}}">{{this.name}}</option>
+							{{/each}}
+						</select>
+					</div>
+
+					<div class="mb-4">
+						<label class="form-label text-muted small mb-1">Reference document</label>
+						<input type="file" class="form-control form-control-sm" />
+					</div>
+
+					<div class="mt-auto text-end">
+						<button type="submit" class="btn btn-sm px-4 text-white"
+								style="background:#2d4b8e" {{#unless availableDevices}}disabled{{/unless}}>
+							Check out
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	{{!-- Check In --}}
+	<div class="col-md-6">
+		<div class="card border-0 shadow-sm h-100">
+			<div class="card-body p-4 d-flex flex-column">
+				<h6 class="fw-semibold mb-4">Check in an item</h6>
+
+				<form method="POST" action="/transactions/checkin" class="d-flex flex-column flex-grow-1">
+					<div class="mb-3">
+						<label class="form-label text-muted small mb-1">Item (serial #)</label>
+						{{#if activeCheckouts}}
+						<select name="historyId" id="checkinSelect" class="form-select form-select-sm" required>
+							<option value="" data-user="">Select item…</option>
+							{{#each activeCheckouts}}
+							<option value="{{this.id}}" data-user="{{this.user_name}}">
+								{{this.serial_number}} — {{this.model_name}} ({{this.user_name}})
+							</option>
+							{{/each}}
+						</select>
+						{{else}}
+						<div class="form-control form-control-sm text-muted bg-light">No active checkouts</div>
+						{{/if}}
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label text-muted small mb-1">Returned by</label>
+						<input type="text" id="returnedBy" class="form-control form-control-sm bg-light"
+							   readonly placeholder="Auto-filled from selection" />
+					</div>
+
+					<div class="mb-4">
+						<label class="form-label text-muted small mb-1">Inspection document</label>
+						<input type="file" class="form-control form-control-sm" />
+					</div>
+
+					<div class="mt-auto text-end">
+						<button type="submit" class="btn btn-sm px-4 text-white"
+								style="background:#2d4b8e" {{#unless activeCheckouts}}disabled{{/unless}}>
+							Check in
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script>
+	const sel = document.getElementById('checkinSelect')
+	const field = document.getElementById('returnedBy')
+	if (sel) {
+		sel.addEventListener('change', () => {
+			const opt = sel.options[sel.selectedIndex]
+			field.value = opt.dataset.user || ''
+		})
+	}
+</script>

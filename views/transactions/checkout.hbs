@@ -1,0 +1,76 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+	<div>
+		<h5 class="fw-semibold mb-0">Check Out Device</h5>
+		<small class="text-muted">Assign an available device to a user</small>
+	</div>
+	<a href="/transactions" class="btn btn-outline-secondary btn-sm">
+		<i class="bi bi-arrow-left me-1"></i>Back
+	</a>
+</div>
+
+{{> flash}}
+
+{{#if errors}}
+<div class="alert alert-danger">
+	<strong>Please fix the following:</strong>
+	<ul class="mb-0 mt-1">
+		{{#each errors}}<li>{{this}}</li>{{/each}}
+	</ul>
+</div>
+{{/if}}
+
+<div class="card border-0 shadow-sm" style="max-width:560px">
+	<div class="card-body p-4">
+		<form method="POST" action="/transactions/checkout">
+
+			<div class="mb-3">
+				<label class="form-label fw-medium">
+					Device
+					<span class="badge bg-success ms-1 fw-normal" style="font-size:.7rem">Available only</span>
+				</label>
+				{{#if devices}}
+				<select name="deviceId" class="form-select" required>
+					<option value="">Select a device…</option>
+					{{#each devices}}
+					<option value="{{this.id}}" {{#if (eq this.id ../values.deviceId)}}selected{{/if}}>
+						{{this.model_name}} — <span class="font-monospace">{{this.serial_number}}</span>
+					</option>
+					{{/each}}
+				</select>
+				{{else}}
+				<div class="alert alert-warning mb-0">
+					<i class="bi bi-exclamation-triangle me-1"></i>
+					No available devices right now.
+				</div>
+				{{/if}}
+			</div>
+
+			<div class="mb-4">
+				<label class="form-label fw-medium">Assign To</label>
+				{{#if users}}
+				<select name="userId" class="form-select" required>
+					<option value="">Select a user…</option>
+					{{#each users}}
+					<option value="{{this.id}}" {{#if (eq this.id ../values.userId)}}selected{{/if}}>
+						{{this.name}} — {{this.email}}
+					</option>
+					{{/each}}
+				</select>
+				{{else}}
+				<div class="alert alert-warning mb-0">
+					<i class="bi bi-exclamation-triangle me-1"></i>
+					No active users found.
+				</div>
+				{{/if}}
+			</div>
+
+			<div class="d-flex gap-2">
+				<button type="submit" class="btn btn-primary" {{#unless devices}}disabled{{/unless}}>
+					<i class="bi bi-box-arrow-up me-1"></i>Check Out
+				</button>
+				<a href="/transactions" class="btn btn-outline-secondary">Cancel</a>
+			</div>
+
+		</form>
+	</div>
+</div>

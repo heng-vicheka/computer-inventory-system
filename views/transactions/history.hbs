@@ -1,0 +1,50 @@
+<div class="card border-0 shadow-sm">
+	<div class="table-responsive">
+		<table class="table table-hover align-middle mb-0">
+			<thead class="table-light">
+				<tr>
+					<th>Device</th>
+					<th>Serial No.</th>
+					<th>Assigned To</th>
+					<th>Checkout Date</th>
+					<th>Return Date</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#each transactions}}
+				<tr>
+					<td class="fw-medium">{{this.model_name}}</td>
+					<td class="font-monospace text-muted small">{{this.serial_number}}</td>
+					<td>
+						<div>{{this.user_name}}</div>
+						<div class="text-muted small">{{this.user_email}}</div>
+					</td>
+					<td>{{formatDate this.checkout_date}}</td>
+					<td>
+						{{#if this.return_date}}
+							{{formatDate this.return_date}}
+						{{else}}
+							<span class="text-muted">—</span>
+						{{/if}}
+					</td>
+					<td>
+						{{#if this.return_date}}
+							<span class="badge bg-success">Returned</span>
+						{{else}}
+							<span class="badge bg-primary">Active</span>
+						{{/if}}
+					</td>
+				</tr>
+				{{else}}
+				<tr>
+					<td colspan="6" class="text-center text-muted py-5">
+						<i class="bi bi-inbox fs-4 d-block mb-2"></i>
+						No transactions yet.
+					</td>
+				</tr>
+				{{/each}}
+			</tbody>
+		</table>
+	</div>
+</div>
