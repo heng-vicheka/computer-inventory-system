@@ -16,17 +16,8 @@
 		<link rel="stylesheet" href="/css/style.css" />
 	</head>
 	<body>
-		<div class="app">
-			{{> navbar}}
-			<div class="main">
-				{{> header}}
-				<main class="content">
-					{{> flash}}
-					{{{body}}}
-				</main>
-			</div>
-		</div>
-
+		{{> flash}}
+		{{{body}}}
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	</body>
 </html>
