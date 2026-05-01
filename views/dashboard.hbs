@@ -1,61 +1,70 @@
-<div id="panel-dashboard" class="panel block">
-    <div class="stats-grid">
-        <div class="stat-card stat-total">
-            <div class="stat-label">Total assets</div>
-            <div class="stat-value">{{stats.total}}</div>
-        </div>
-        <div class="stat-card stat-available">
-            <div class="stat-label">Available</div>
-            <div class="stat-value">{{stats.available}}</div>
-        </div>
-        <div class="stat-card stat-inuse">
-            <div class="stat-label">In use</div>
-            <div class="stat-value">{{stats.inUse}}</div>
-        </div>
-        <div class="stat-card stat-maintenance">
-            <div class="stat-label">Maintenance</div>
-            <div class="stat-value">{{stats.maintenance}}</div>
-        </div>
-        <div class="stat-card stat-retired">
-            <div class="stat-label">Retired</div>
-            <div class="stat-value">{{stats.retired}}</div>
-        </div>
-    </div>
+<div class="row g-3 mb-4">
+	<div class="col-sm-6 col-xl-3">
+		<div class="card border-0 shadow-sm h-100">
+			<div class="card-body">
+				<div class="text-muted small mb-1">Total assets</div>
+				<div class="fs-3 fw-bold text-primary">{{stats.total}}</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6 col-xl-3">
+		<div class="card border-0 shadow-sm h-100">
+			<div class="card-body">
+				<div class="text-muted small mb-1">Available</div>
+				<div class="fs-3 fw-bold text-success">{{stats.available}}</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6 col-xl-3">
+		<div class="card border-0 shadow-sm h-100">
+			<div class="card-body">
+				<div class="text-muted small mb-1">In use</div>
+				<div class="fs-3 fw-bold text-warning">{{stats.inUse}}</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6 col-xl-3">
+		<div class="card border-0 shadow-sm h-100">
+			<div class="card-body">
+				<div class="text-muted small mb-1">Maintenance</div>
+				<div class="fs-3 fw-bold text-danger">{{stats.maintenance}}</div>
+			</div>
+		</div>
+	</div>
+</div>
 
-    {{!-- Place Holder for real activity data or logs --}}
-    <div class="card recent-activity">
-        <div class="card-header">
-            <span>Recent activity</span>
-        </div>
-        <div class="card-body">
-            <div class="activity-row">
-                <div class="activity-dot bg-blue"></div>
-                <div>
-                    <div>Laptop Dell XPS 15 <strong>checked out</strong> to Maria Santos</div>
-                    <div class="muted">2 hours ago · by John Doe</div>
-                </div>
-            </div>
-            <div class="activity-row">
-                <div class="activity-dot bg-green"></div>
-                <div>
-                    <div>Monitor LG 27" <strong>checked in</strong> from Alex Cruz</div>
-                    <div class="muted">5 hours ago · by John Doe</div>
-                </div>
-            </div>
-            <div class="activity-row">
-                <div class="activity-dot bg-amber"></div>
-                <div>
-                    <div>Desktop HP EliteDesk set to <strong>Maintenance</strong></div>
-                    <div class="muted">Yesterday · by Jane Smith</div>
-                </div>
-            </div>
-            <div class="activity-row">
-                <div class="activity-dot bg-blue"></div>
-                <div>
-                    <div>MacBook Pro 14" <strong>checked out</strong> to Kevin Lim</div>
-                    <div class="muted">Yesterday · by John Doe</div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="card border-0 shadow-sm">
+	<div class="card-body">
+		<h6 class="fw-semibold mb-3">Recent activity</h6>
+		<div class="d-flex flex-column gap-3">
+			<div class="d-flex align-items-start gap-3">
+				<span class="badge rounded-circle bg-primary p-2 mt-1" style="width:10px;height:10px;"></span>
+				<div>
+					<div class="small">Laptop Dell XPS 15 <strong>checked out</strong> to Maria Santos</div>
+					<div class="text-muted" style="font-size:.75rem;">2 hours ago · by John Doe</div>
+				</div>
+			</div>
+			<div class="d-flex align-items-start gap-3">
+				<span class="badge rounded-circle bg-success p-2 mt-1" style="width:10px;height:10px;"></span>
+				<div>
+					<div class="small">Monitor LG 27" <strong>checked in</strong> from Alex Cruz</div>
+					<div class="text-muted" style="font-size:.75rem;">5 hours ago · by John Doe</div>
+				</div>
+			</div>
+			<div class="d-flex align-items-start gap-3">
+				<span class="badge rounded-circle bg-warning p-2 mt-1" style="width:10px;height:10px;"></span>
+				<div>
+					<div class="small">Desktop HP EliteDesk set to <strong>Maintenance</strong></div>
+					<div class="text-muted" style="font-size:.75rem;">Yesterday · by Jane Smith</div>
+				</div>
+			</div>
+			<div class="d-flex align-items-start gap-3">
+				<span class="badge rounded-circle bg-primary p-2 mt-1" style="width:10px;height:10px;"></span>
+				<div>
+					<div class="small">MacBook Pro 14" <strong>checked out</strong> to Kevin Lim</div>
+					<div class="text-muted" style="font-size:.75rem;">Yesterday · by John Doe</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
