@@ -8,28 +8,19 @@
 	</a>
 </div>
 
-{{> flash}}
-
-{{#if errors}}
-<div class="alert alert-danger">
-	<strong>Please fix the following:</strong>
-	<ul class="mb-0 mt-1">
-		{{#each errors}}<li>{{this}}</li>{{/each}}
-	</ul>
-</div>
-{{/if}}
+<div id="form-alert"></div>
 
 <div class="card border-0 shadow-sm" style="max-width:560px">
 	<div class="card-body p-4">
-		<form method="POST" action="/users">
+		<form id="create-user-form">
 			<div class="mb-3">
 				<label class="form-label fw-medium">Full Name</label>
-				<input type="text" name="name" class="form-control" value="{{values.name}}" placeholder="e.g. Jane Smith" required />
+				<input type="text" name="name" class="form-control" placeholder="e.g. Jane Smith" required />
 			</div>
 
 			<div class="mb-3">
 				<label class="form-label fw-medium">Email Address</label>
-				<input type="email" name="email" class="form-control" value="{{values.email}}" placeholder="jane@example.com" required />
+				<input type="email" name="email" class="form-control" placeholder="jane@example.com" required />
 			</div>
 
 			<div class="mb-3">
@@ -37,7 +28,7 @@
 				<select name="userRoleId" class="form-select" required>
 					<option value="">Select role…</option>
 					{{#each roles}}
-					<option value="{{this.id}}" {{#if (eq this.id ../values.userRoleId)}}selected{{/if}}>{{this.name}}</option>
+					<option value="{{this.id}}">{{this.name}}</option>
 					{{/each}}
 				</select>
 			</div>
@@ -46,8 +37,8 @@
 				<label class="form-label fw-medium">Status</label>
 				<select name="status" class="form-select" required>
 					<option value="">Select status…</option>
-					<option value="active"   {{#if (eq values.status 'active')}}selected{{/if}}>Active</option>
-					<option value="inactive" {{#if (eq values.status 'inactive')}}selected{{/if}}>Inactive</option>
+					<option value="active">Active</option>
+					<option value="inactive">Inactive</option>
 				</select>
 			</div>
 
@@ -60,3 +51,37 @@
 		</form>
 	</div>
 </div>
+
+<script>
+	document.getElementById('create-user-form').addEventListener('submit', async (e) => {
+		e.preventDefault()
+		const form = e.target
+		const submitBtn = form.querySelector('[type="submit"]')
+		submitBtn.disabled = true
+
+		try {
+			const res = await fetch('/api/users', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					name: form.name.value,
+					email: form.email.value,
+					userRoleId: form.userRoleId.value,
+					status: form.status.value,
+				}),
+			})
+			const data = await res.json()
+			if (!res.ok) {
+				document.getElementById('form-alert').innerHTML =
+					`<div class="alert alert-danger">${data.error || 'Failed to create user.'}</div>`
+				submitBtn.disabled = false
+			} else {
+				location.href = '/users?created=1'
+			}
+		} catch {
+			document.getElementById('form-alert').innerHTML =
+				`<div class="alert alert-danger">Network error. Please try again.</div>`
+			submitBtn.disabled = false
+		}
+	})
+</script>
