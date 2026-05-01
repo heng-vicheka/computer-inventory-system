@@ -7,7 +7,6 @@ import { db } from '../db/db.js'
 import { client } from '../db/db.js'
 import { userRoles, users } from '../db/schema.js'
 
-
 // Validate password requirements
 function validatePassword(password) {
 	const requirements = {
@@ -165,7 +164,13 @@ export async function handleSignup(req, res) {
 
 		await client.execute({
 			sql: 'INSERT INTO users (name, email, user_role_id, password_hash, status) VALUES (?, ?, ?, ?, ?)',
-			args: [deriveDisplayNameFromEmail(normalizedEmail), normalizedEmail, roleId, hashedPassword, 'active'],
+			args: [
+				deriveDisplayNameFromEmail(normalizedEmail),
+				normalizedEmail,
+				roleId,
+				hashedPassword,
+				'active',
+			],
 		})
 
 		return res.render('signup', {
@@ -282,8 +287,7 @@ export async function handleLogin(req, res) {
 		res.cookie('role', user.role, cookieOptions)
 
 		return res.redirect('/')
-	} catch (err) {
-		console.error('[login error]', err)
+	} catch {
 		return res.render('login', {
 			layout: 'auth',
 			title: 'Login',
@@ -342,8 +346,10 @@ export async function handleApiLogin(req, res) {
 }
 
 export function handleLogout(_req, res) {
-	res.clearCookie('auth_token')
-	res.clearCookie('auth')
-	res.clearCookie('role')
-	res.redirect('/login')
+	const cookieOptions = getAuthCookieOptions()
+	res.clearCookie('auth_token', cookieOptions)
+	res.clearCookie('role', cookieOptions)
+	// legacy cookie name (safe to attempt clearing)
+	res.clearCookie('auth', cookieOptions)
+	return res.redirect('/login')
 }
