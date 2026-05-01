@@ -8,20 +8,11 @@
 	</a>
 </div>
 
-{{> flash}}
-
-{{#if errors}}
-<div class="alert alert-danger">
-	<strong>Please fix the following:</strong>
-	<ul class="mb-0 mt-1">
-		{{#each errors}}<li>{{this}}</li>{{/each}}
-	</ul>
-</div>
-{{/if}}
+<div id="form-alert"></div>
 
 <div class="card border-0 shadow-sm" style="max-width:560px">
 	<div class="card-body p-4">
-		<form method="POST" action="/users/{{user.id}}">
+		<form id="edit-user-form">
 			<div class="mb-3">
 				<label class="form-label fw-medium">Full Name</label>
 				<input type="text" name="name" class="form-control" value="{{user.name}}" required />
@@ -65,12 +56,62 @@
 		<div class="card-body">
 			<h6 class="text-danger mb-1">Danger Zone</h6>
 			<p class="text-muted small mb-3">Deleting a user is a soft delete — their data is preserved but the account is deactivated.</p>
-			<form method="POST" action="/users/{{user.id}}/delete"
-				  onsubmit="return confirm('Delete {{user.name}}? This will deactivate their account.')">
-				<button type="submit" class="btn btn-outline-danger btn-sm">
-					<i class="bi bi-trash me-1"></i>Delete User
-				</button>
-			</form>
+			<button id="delete-btn" class="btn btn-outline-danger btn-sm">
+				<i class="bi bi-trash me-1"></i>Delete User
+			</button>
 		</div>
 	</div>
 </div>
+
+<script>
+	const userId = {{user.id}}
+
+	document.getElementById('edit-user-form').addEventListener('submit', async (e) => {
+		e.preventDefault()
+		const form = e.target
+		const submitBtn = form.querySelector('[type="submit"]')
+		submitBtn.disabled = true
+
+		try {
+			const res = await fetch(`/api/users/${userId}`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					name: form.name.value,
+					email: form.email.value,
+					userRoleId: form.userRoleId.value,
+					status: form.status.value,
+				}),
+			})
+			const data = await res.json()
+			if (!res.ok) {
+				document.getElementById('form-alert').innerHTML =
+					`<div class="alert alert-danger">${data.error || 'Failed to update user.'}</div>`
+				submitBtn.disabled = false
+			} else {
+				location.href = '/users?updated=1'
+			}
+		} catch {
+			document.getElementById('form-alert').innerHTML =
+				`<div class="alert alert-danger">Network error. Please try again.</div>`
+			submitBtn.disabled = false
+		}
+	})
+
+	document.getElementById('delete-btn').addEventListener('click', async () => {
+		if (!confirm('Delete {{user.name}}? This will deactivate their account.')) return
+		try {
+			const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' })
+			if (res.ok) {
+				location.href = '/users?deleted=1'
+			} else {
+				const data = await res.json()
+				document.getElementById('form-alert').innerHTML =
+					`<div class="alert alert-danger">${data.error || 'Failed to delete user.'}</div>`
+			}
+		} catch {
+			document.getElementById('form-alert').innerHTML =
+				`<div class="alert alert-danger">Network error. Please try again.</div>`
+		}
+	})
+</script>

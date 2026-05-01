@@ -8,8 +8,6 @@ import apiRouter from './src/routes/api.routes.js'
 import clientRouter from './src/routes/client.routes.js'
 
 app.disable('x-powered-by')
-import usersRouter from './src/routes/users.js'
-import transactionsRouter from './src/routes/transactions.js'
 
 app.use(auditLogger)
 app.use(corsMiddleware)
@@ -19,11 +17,9 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use('/api', apiRouter)
 app.use('/', clientRouter)
-app.use('/users', usersRouter)
-app.use('/transactions', transactionsRouter)
 
 const port = process.env.PORT || 3000
 
 app.listen(port, () => {
-	console.log(`Server running at http://localhost:${port}`)
+	console.log(`Server running at http://localhost:${port}`) // eslint-disable-line no-console
 })

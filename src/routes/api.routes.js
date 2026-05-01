@@ -26,6 +26,46 @@ apiRouter.post('/users', async (req, res) => {
 	return res.status(201).json({ id: Number(result.lastInsertRowid) })
 })
 
+apiRouter.put('/users/:id', async (req, res) => {
+	const { name, email, userRoleId, status } = req.body
+	if (!name || !email || !userRoleId || !status) {
+		return res.status(400).json({ error: 'name, email, userRoleId, and status are required.' })
+	}
+	if (!['active', 'inactive'].includes(status)) {
+		return res.status(400).json({ error: 'status must be "active" or "inactive".' })
+	}
+
+	const existing = await client.execute({
+		sql: 'SELECT id FROM users WHERE id = ? AND is_deleted = 0',
+		args: [req.params.id],
+	})
+	if (!existing.rows.length) return res.status(404).json({ error: 'User not found.' })
+
+	const dup = await client.execute({
+		sql: 'SELECT id FROM users WHERE email = ? AND is_deleted = 0 AND id != ?',
+		args: [email.trim().toLowerCase(), req.params.id],
+	})
+	if (dup.rows.length) return res.status(409).json({ error: 'Email already in use.' })
+
+	await client.execute({
+		sql: `UPDATE users
+			  SET name = ?, email = ?, user_role_id = ?, status = ?, date_updated = CURRENT_TIMESTAMP
+			  WHERE id = ? AND is_deleted = 0`,
+		args: [name.trim(), email.trim().toLowerCase(), parseInt(userRoleId), status, req.params.id],
+	})
+
+	return res.json({ updated: true })
+})
+
+apiRouter.delete('/users/:id', async (req, res) => {
+	await client.execute({
+		sql: `UPDATE users SET is_deleted = 1, date_deleted = CURRENT_TIMESTAMP
+			  WHERE id = ? AND is_deleted = 0`,
+		args: [req.params.id],
+	})
+	return res.json({ deleted: true })
+})
+
 apiRouter.patch('/users/:id/role', async (req, res) => {
 	const { roleId } = req.body
 	if (!roleId) return res.status(400).json({ error: 'roleId is required.' })

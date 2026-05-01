@@ -1,50 +1,57 @@
 <div class="card border-0 shadow-sm">
-	<div class="table-responsive">
-		<table class="table table-hover align-middle mb-0">
-			<thead class="table-light">
-				<tr>
-					<th>Device</th>
-					<th>Serial No.</th>
-					<th>Assigned To</th>
-					<th>Checkout Date</th>
-					<th>Return Date</th>
-					<th>Status</th>
-				</tr>
-			</thead>
-			<tbody>
-				{{#each transactions}}
-				<tr>
-					<td class="fw-medium">{{this.model_name}}</td>
-					<td class="font-monospace text-muted small">{{this.serial_number}}</td>
-					<td>
-						<div>{{this.user_name}}</div>
-						<div class="text-muted small">{{this.user_email}}</div>
-					</td>
-					<td>{{formatDate this.checkout_date}}</td>
-					<td>
-						{{#if this.return_date}}
-							{{formatDate this.return_date}}
-						{{else}}
-							<span class="text-muted">—</span>
-						{{/if}}
-					</td>
-					<td>
-						{{#if this.return_date}}
-							<span class="badge bg-success">Returned</span>
-						{{else}}
-							<span class="badge bg-primary">Active</span>
-						{{/if}}
-					</td>
-				</tr>
-				{{else}}
-				<tr>
-					<td colspan="6" class="text-center text-muted py-5">
-						<i class="bi bi-inbox fs-4 d-block mb-2"></i>
-						No transactions yet.
-					</td>
-				</tr>
-				{{/each}}
-			</tbody>
-		</table>
+	<div class="card-body px-4 pt-4 pb-3 d-flex justify-content-between align-items-center">
+		<span class="fw-semibold">Asset history</span>
+		<input id="serial-search" type="text" class="form-control form-control-sm"
+			   placeholder="Search by serial #…" style="width:200px" />
 	</div>
+
+	{{#if devices}}
+	<div id="history-list">
+		{{#each devices}}
+		<div class="device-group border-top px-4 py-3" data-serial="{{this.serial_number}}">
+			<div class="text-muted mb-2" style="font-size:.75rem;letter-spacing:.02em;">
+				{{this.serial_number}} — {{this.model_name}}
+			</div>
+			{{#each this.entries}}
+			<div class="d-flex align-items-start gap-3 py-2 {{#unless @last}}border-bottom border-light{{/unless}}">
+				{{#if (eq this.type 'out')}}
+				<span class="rounded-circle bg-primary flex-shrink-0 mt-1" style="width:9px;height:9px;display:inline-block"></span>
+				<div>
+					<div class="small"><strong>Checked out</strong> to {{this.user_name}}</div>
+					<div class="text-muted" style="font-size:.75rem;">
+						{{formatDate this.date}}
+						{{#if this.ongoing}} · Duration: ongoing{{/if}}
+						· <a href="#" class="text-muted text-decoration-none" style="border-bottom:1px dashed #aaa">View doc</a>
+					</div>
+				</div>
+				{{else}}
+				<span class="rounded-circle bg-success flex-shrink-0 mt-1" style="width:9px;height:9px;display:inline-block"></span>
+				<div>
+					<div class="small"><strong>Checked in</strong> from {{this.user_name}}</div>
+					<div class="text-muted" style="font-size:.75rem;">
+						{{formatDate this.date}} · Duration: {{this.duration}}
+						· <a href="#" class="text-muted text-decoration-none" style="border-bottom:1px dashed #aaa">View doc</a>
+					</div>
+				</div>
+				{{/if}}
+			</div>
+			{{/each}}
+		</div>
+		{{/each}}
+	</div>
+	{{else}}
+	<div class="text-center text-muted py-5 border-top">
+		<i class="bi bi-inbox fs-4 d-block mb-2"></i>
+		No transactions yet.
+	</div>
+	{{/if}}
 </div>
+
+<script>
+	document.getElementById('serial-search').addEventListener('input', function () {
+		const q = this.value.toLowerCase()
+		document.querySelectorAll('.device-group').forEach((el) => {
+			el.style.display = el.dataset.serial.toLowerCase().includes(q) ? '' : 'none'
+		})
+	})
+</script>
