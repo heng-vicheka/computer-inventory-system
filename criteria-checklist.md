@@ -24,7 +24,7 @@ Scan basis: current files in this branch.
 ## 3) Security & Middleware Requirements
 
 - [x] CORS is strictly same-origin (app domain only).
-- [ ] Rate limiting is max 20 requests/minute/IP.
+- [x] Rate limiting is max 20 requests/minute/IP.
 - [x] `morgan` request logging is integrated for audit trail.
 - [ ] All API routes except `/login` require valid Bearer JWT.
 - [ ] API key middleware validates custom header (for example `x-api-key`) for non-browser access.
@@ -43,7 +43,7 @@ Scan basis: current files in this branch.
 - [x] Item has Model field.
 - [x] Item has Brand field.
 - [x] Item has Category field.
-- [ ] Item has Status field with allowed values: Available, In-Use, Maintenance, Retired.
+- [x] Item has Status field with allowed values: Available, In-Use, Maintenance, Retired.
 - [x] Item has Date Acquired field.
 - [x] Classification supports Computers (Laptop/Desktop/Server).
 - [x] Classification supports Peripherals (Monitor/Keyboard/etc.).
