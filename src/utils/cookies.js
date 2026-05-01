@@ -5,7 +5,13 @@ export function parseCookies(cookieHeader) {
 		cookieHeader
 			.split(';')
 			.map((cookie) => cookie.trim().split('='))
-			.map(([name, value]) => [name, decodeURIComponent(value || '')]),
+			.map(([name, value]) => {
+				try {
+					return [name, decodeURIComponent(value || '')]
+				} catch {
+					return [name, value || '']
+				}
+			}),
 	)
 }
 

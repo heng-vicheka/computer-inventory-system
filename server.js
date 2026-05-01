@@ -18,6 +18,22 @@ app.use(express.urlencoded({ extended: false }))
 app.use('/api', apiRouter)
 app.use('/', clientRouter)
 
+app.use((error, req, res, _next) => {
+	console.error('Unhandled request error:', error)
+
+	if (res.headersSent) return
+
+	if (req.path.startsWith('/api')) {
+		res.status(500).json({ message: 'Internal server error.' })
+		return
+	}
+
+	res.status(500).render('error', {
+		message: 'Something went wrong.',
+		error: process.env.NODE_ENV === 'production' ? 'Unexpected server error.' : error.message,
+	})
+})
+
 const port = Number(process.env.PORT) || 4000
 
 if (process.env.VERCEL !== '1') {

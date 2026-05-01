@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { authenticateUser, getAuthCookieOptions, issueAuthToken } from '../utils/auth.js'
 import { getCookieValue } from '../utils/cookies.js'
 import { verifyJwt } from '../utils/jwt.js'
@@ -90,7 +90,7 @@ export function renderSignup(req, res) {
 
 export async function handleSignup(req, res) {
 	try {
-		const { role, email, password, passwordConfirm } = req.body
+		const { role, email, password, passwordConfirm } = req.body ?? {}
 		const normalizedEmail = String(email || '')
 			.trim()
 			.toLowerCase()
@@ -178,7 +178,8 @@ export async function handleSignup(req, res) {
 			successMessage: 'Account created! You will be redirected to login in 3 seconds.',
 			title: 'Sign Up',
 		})
-	} catch {
+	} catch (error) {
+		console.error('Signup failed:', error)
 		return res.render('signup', {
 			layout: 'auth',
 			errors: ['An error occurred during signup. Please try again.'],
@@ -232,13 +233,14 @@ export async function handleVerifyEmail(req, res) {
 			.where(eq(users.id, userRecord.id))
 
 		return res.redirect('/login?verified=true')
-	} catch {
+	} catch (error) {
+		console.error('Email verification failed:', error)
 		return res.redirect('/login?verified=false&reason=server_error')
 	}
 }
 
 export async function handleLogin(req, res) {
-	const { email = '', password = '', role = 'user' } = req.body
+	const { email = '', password = '', role = 'user' } = req.body ?? {}
 	const errors = []
 	let emailError = ''
 	let passwordError = ''
@@ -287,7 +289,8 @@ export async function handleLogin(req, res) {
 		res.cookie('role', user.role, cookieOptions)
 
 		return res.redirect('/')
-	} catch {
+	} catch (error) {
+		console.error('Login failed:', error)
 		return res.render('login', {
 			layout: 'auth',
 			title: 'Login',
@@ -338,7 +341,8 @@ export async function handleApiLogin(req, res) {
 				role: user.role,
 			},
 		})
-	} catch {
+	} catch (error) {
+		console.error('API login failed:', error)
 		return res.status(500).json({
 			message: 'Unable to sign in right now. Please try again later.',
 		})
