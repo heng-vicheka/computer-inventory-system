@@ -16,11 +16,17 @@ export const users = sqliteTable('users', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	name: text('name').notNull(),
 	email: text('email').notNull().unique(),
+	password: text('password').notNull(),
 	userRoleId: integer('user_role_id')
 		.notNull()
 		.references(() => userRoles.id),
+	passwordHash: text('password_hash').notNull(),
+	apiKeyId: integer('api_key_id').references(() => apiKeys.id),
 
 	status: text('status').notNull(),
+	emailVerified: integer('email_verified', { mode: 'boolean' }).default(false),
+	emailVerificationToken: text('email_verification_token'),
+	verificationTokenExpiry: text('verification_token_expiry'),
 	profilePictureUrl: text('profile_picture_url'),
 	dateCreated: text('date_created')
 		.default(sql`CURRENT_TIMESTAMP`)
@@ -126,6 +132,27 @@ export const history = sqliteTable('history', {
 })
 
 /* =========================
+   API KEYS
+========================= */
+export const apiKeys = sqliteTable('api_keys', {
+	id: integer('id').primaryKey({ autoIncrement: true }),
+
+	keyHash: text('key_hash').notNull(),
+	label: text('label').notNull(),
+	status: integer('status', { mode: 'boolean' }).default(true),
+
+	dateCreated: text('date_created')
+		.default(sql`CURRENT_TIMESTAMP`)
+		.notNull(),
+
+	dateUpdated: text('date_updated')
+		.default(sql`CURRENT_TIMESTAMP`)
+		.notNull(),
+	isDeleted: integer('is_deleted', { mode: 'boolean' }).default(false),
+	dateDeleted: text('date_deleted'),
+})
+
+/* =========================
    USERS RELATIONS
 ========================= */
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -134,6 +161,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 		references: [userRoles.id],
 	}),
 	history: many(history),
+	apiKey: one(apiKeys, {
+		fields: [users.apiKeyId],
+		references: [apiKeys.id],
+	}),
 }))
 
 /* =========================

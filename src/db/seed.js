@@ -40,7 +40,7 @@ async function main() {
 
 	await db.insert(deviceStatuses).values([
 		{ id: 1, name: 'Available' },
-		{ id: 2, name: 'In Use' },
+		{ id: 2, name: 'In-Use' },
 		{ id: 3, name: 'Maintenance' },
 		{ id: 4, name: 'Retired' },
 	])
@@ -60,6 +60,7 @@ async function main() {
 			userRoleId: 1,
 			status: 'active',
 			profilePictureUrl: 'https://example.com/profiles/seng.jpg',
+			passwordHash: 'hashed_password_123',
 		},
 		{
 			id: 2,
@@ -68,6 +69,7 @@ async function main() {
 			userRoleId: 2,
 			status: 'active',
 			profilePictureUrl: 'https://example.com/profiles/vicheka.jpg',
+			passwordHash: 'hashed_password_456',
 		},
 		{
 			id: 3,
@@ -75,6 +77,7 @@ async function main() {
 			email: 'heng.c@example.com',
 			userRoleId: 3,
 			status: 'inactive',
+			passwordHash: 'hashed_password_789',
 		},
 	])
 

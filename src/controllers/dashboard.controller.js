@@ -1,4 +1,4 @@
-import { getDashboardStats } from '../models/dashboardModel.js'
+import { getDashboardStats } from '../models/dashboard.model.js'
 
 export const renderDashboard = async (req, res) => {
 	try {
