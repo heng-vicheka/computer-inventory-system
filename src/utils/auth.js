@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { eq } from 'drizzle-orm'
 import { db } from '../db/db.js'
 import { userRoles, users } from '../db/schema.js'
@@ -15,15 +15,11 @@ async function verifyPassword(inputPassword, userRecord) {
 
 	if (userRecord.passwordHash) {
 		try {
-			const matchedHash = await bcrypt.compare(candidate, userRecord.passwordHash)
-			if (matchedHash) return true
+			return await bcrypt.compare(candidate, userRecord.passwordHash)
 		} catch {
-			// Keep fallback for legacy seeded values that are not bcrypt hashes.
+			return false
 		}
 	}
-
-	if (userRecord.password && candidate === userRecord.password) return true
-	if (userRecord.passwordHash && candidate === userRecord.passwordHash) return true
 
 	return false
 }
@@ -40,7 +36,6 @@ export async function authenticateUser(email, password) {
 			name: users.name,
 			email: users.email,
 			status: users.status,
-			password: users.password,
 			passwordHash: users.passwordHash,
 			roleName: userRoles.name,
 		})

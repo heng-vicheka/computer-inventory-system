@@ -25,6 +25,7 @@
 		"lint:spell": "cspell .",
 		"format": "prettier --write .",
 		"seed": "node src/db/seed.js",
+		"seed:admin": "tsx src/db/seed-admin.js",
 		"prepare": "lefthook install",
 		"precommit": "lefthook run pre-commit",
 		"prepush": "lefthook run pre-push",
@@ -57,16 +58,16 @@
 	"dependencies": {
 		"@libsql/client": "^0.17.3",
 		"@uploadthing/react": "^7.3.3",
+		"bcryptjs": "^2.4.3",
 		"cors": "^2.8.6",
 		"dotenv": "^17.4.2",
-		"bcrypt": "^6.0.0",
 		"drizzle-orm": "^0.45.2",
 		"express": "^5.2.1",
-		"express-handlebars": "^9.0.1",
+		"express-handlebars": "8.0.3",
 		"express-rate-limit": "^8.4.1",
 		"morgan": "^1.10.1",
-		"uploadthing": "^7.7.4",
 		"nodemailer": "^8.0.7",
+		"uploadthing": "^7.7.4",
 		"url": "^0.11.4"
 	},
 	"pnpm": {
@@ -78,6 +79,11 @@
 			"postcss": "^8.5.10",
 			"esbuild": "^0.25.0",
 			"effect": "3.20.0"
-		}
+		},
+		"ignoredBuiltDependencies": [
+			"esbuild",
+			"lefthook",
+			"msgpackr-extract"
+		]
 	}
 }
