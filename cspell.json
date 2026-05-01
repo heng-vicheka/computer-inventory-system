@@ -15,7 +15,8 @@
 		"topbar",
 		"turso",
 		"TURSO",
-		"vicheka"
+		"vicheka",
+		"inuse"
 	],
 	"ignorePaths": [
 		"cspell.json",

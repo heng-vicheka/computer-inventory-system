@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { db } from './db'
+import { db } from './db.js'
 import {
 	deviceBrands,
 	deviceCategories,
@@ -9,12 +9,12 @@ import {
 	userRoles,
 	users,
 	devices,
-} from './schema'
+} from './schema.js'
 
 async function main() {
 	const existingSeed = await db.select().from(userRoles).limit(1)
 	if (existingSeed.length > 0) {
-		console.log('Seed data already exists. Skipping seeding.')
+		// console.log('Seed data already exists. Skipping seeding.')
 		return
 	}
 
@@ -139,10 +139,10 @@ async function main() {
 		},
 	])
 
-	console.log('Seed data inserted successfully.')
+	// console.log('Seed data inserted successfully.')
 }
 
-main().catch((error) => {
-	console.error('Failed to seed database:', error)
+main().catch(() => {
+	// console.error('Failed to seed database:', error)
 	process.exit(1)
 })
