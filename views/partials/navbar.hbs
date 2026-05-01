@@ -11,8 +11,8 @@
                 <span class="nav-icon">■</span> Inventory
             </a>
         </li>
-        <li class="nav-item {{#if (eq currentPath '/checkout')}}active{{/if}}">
-            <a href="/checkout" class="nav-link">
+        <li class="nav-item" onclick="showPanel('checkout', this)">
+            <a href="/transactions" class="nav-link">
                 <span class="nav-icon">■</span> Check-in / Out
             </a>
         </li>

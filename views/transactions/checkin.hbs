@@ -1,0 +1,55 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+	<div>
+		<h5 class="fw-semibold mb-0">Check In Device</h5>
+		<small class="text-muted">Return a device to inventory</small>
+	</div>
+	<a href="/transactions" class="btn btn-outline-secondary btn-sm">
+		<i class="bi bi-arrow-left me-1"></i>Back
+	</a>
+</div>
+
+{{> flash}}
+
+<div class="card border-0 shadow-sm">
+	<div class="table-responsive">
+		<table class="table table-hover align-middle mb-0">
+			<thead class="table-light">
+				<tr>
+					<th>Device</th>
+					<th>Serial No.</th>
+					<th>Assigned To</th>
+					<th>Checkout Date</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#each checkouts}}
+				<tr>
+					<td class="fw-medium">{{this.model_name}}</td>
+					<td class="font-monospace text-muted small">{{this.serial_number}}</td>
+					<td>
+						<div>{{this.user_name}}</div>
+						<div class="text-muted small">{{this.user_email}}</div>
+					</td>
+					<td>{{formatDate this.checkout_date}}</td>
+					<td class="text-end">
+						<form method="POST" action="/transactions/checkin/{{this.id}}"
+							  onsubmit="return confirm('Mark this device as returned?')">
+							<button type="submit" class="btn btn-sm btn-success">
+								<i class="bi bi-box-arrow-in-down me-1"></i>Check In
+							</button>
+						</form>
+					</td>
+				</tr>
+				{{else}}
+				<tr>
+					<td colspan="5" class="text-center text-muted py-5">
+						<i class="bi bi-check-circle fs-4 d-block mb-2 text-success"></i>
+						All devices have been returned.
+					</td>
+				</tr>
+				{{/each}}
+			</tbody>
+		</table>
+	</div>
+</div>

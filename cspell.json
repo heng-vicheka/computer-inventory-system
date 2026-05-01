@@ -16,7 +16,8 @@
 		"turso",
 		"TURSO",
 		"Uploadthing",
-		"vicheka"
+		"vicheka",
+		"inuse"
 	],
 	"ignorePaths": [
 		"cspell.json",

@@ -19,6 +19,9 @@ app.engine(
 		helpers: {
 			eq: (a, b) => a === b,
 			ne: (a, b) => a !== b,
+			isEmpty(obj) {
+				return Object.keys(obj).length === 0
+			},
 			formatDate(date) {
 				if (!date) return '—'
 				return new Date(date).toLocaleDateString('en-US', {
