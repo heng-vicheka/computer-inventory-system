@@ -19,7 +19,7 @@
 		"dev": "nodemon --exec tsx server.js",
 		"start": "tsx server.js",
 		"nodemon": "nodemon --exec tsx server.js",
-		"build": "vite build",
+		"build": "node -e \"console.log('No build step required for Express on Vercel')\"",
 		"lint": "eslint .",
 		"lint:prettier": "prettier --check .",
 		"lint:spell": "cspell .",
