@@ -2,21 +2,12 @@
 	<div class="section-header">
 		<span class="section-title">All items</span>
 		<div class="search-bar">
-			<input type="text" placeholder="Search..." />
-			<select>
-				<option>All categories</option>
-				<option>Laptop</option>
-				<option>Desktop</option>
-				<option>Monitor</option>
-				<option>Keyboard</option>
-				<option>Server</option>
+			<input id="inventory-search-input" type="text" placeholder="Search..." />
+			<select id="inventory-category-filter">
+				<option value="">All categories</option>
 			</select>
-			<select>
-				<option>All statuses</option>
-				<option>Available</option>
-				<option>In-Use</option>
-				<option>Maintenance</option>
-				<option>Retired</option>
+			<select id="inventory-status-filter">
+				<option value="">All statuses</option>
 			</select>
 				<button type="button" class="btn btn-primary" onclick="openModal()">+ Add item</button>
 		</div>
@@ -34,10 +25,10 @@
 				<th></th>
 			</tr>
 		</thead>
-		<tbody>
+		<tbody id="inventory-table-body">
 			{{#if devices.length}}
 				{{#each devices}}
-					<tr>
+					<tr class="inventory-row" data-serial="{{serialNumber}}" data-model="{{modelName}}" data-brand="{{brand}}" data-category="{{category}}" data-status="{{status}}">
 						<td>{{serialNumber}}</td>
 						<td><img class="table-thumb" src="{{pictureUrl}}" alt="{{modelName}}" /></td>
 						<td>{{modelName}}</td>
@@ -58,65 +49,13 @@
 					<td colspan="8" class="empty">No inventory items found.</td>
 				</tr>
 			{{/if}}
+			<tr id="inventory-no-results-row" style="display: none;">
+				<td colspan="8" class="empty">No matching items found.</td>
+			</tr>
 		</tbody>
 	</table>
 	</div>
 	{{> item-form}}
-
-<script></script><!--
-				<span style="font-size: 14px; font-weight: 500">Add new item</span>
-				<span class="modal-close" onclick="closeModal()">&#x2715;</span>
-			</div>
-			<div class="form-grid">
-				<div class="form-group">
-					<label>Serial number</label><input id="new-serial" type="text" placeholder="SN-XXXX" />
-				</div>
-				<div class="form-group">
-					<label>Model</label><input id="new-model" type="text" placeholder="e.g. XPS 15" />
-				</div>
-				<div class="form-group">
-					<label>Brand</label><input id="new-brand" type="text" placeholder="e.g. Dell" />
-				</div>
-				<div class="form-group">
-					<label>Category</label><select id="new-category">
-						<option value="">Loading categories...</option>
-				</select>
-			</div>
-			<div class="form-group full" id="new-category-other-group" style="display: none;">
-				<div class="form-group">
-					<label>Other category</label>
-					<input id="new-category-other" type="text" placeholder="Specify a new category" />
-				</div>
-				</div>
-				<div class="form-group">
-					<label>Status</label><select id="new-status">
-						<option value="">Loading statuses...</option>
-								</select>
-				</div>			<div class="form-group full" id="new-status-other-group" style="display: none;">
-					<div class="form-group">
-				<label>Other status</label>
-				<input id="new-status-other" type="text" placeholder="Specify a new status" />
-				</div>
-			</div>				
-				<div class="form-group">
-					<label>Date acquired</label><input id="new-acquired" type="date" />
-				</div>
-				<div class="form-group full">
-					<label>Device image</label>
-					<div class="image-input">
-						<label class="btn" for="device-image-input">Select image</label>
-						<input id="device-image-input" type="file" accept="image/*" />
-						<img id="device-image-preview" class="image-preview" src="" alt="Device preview" hidden />
-					</div>
-				</div>
-			</div>
-			<div class="form-actions">
-				<button type="button" class="btn" onclick="closeModal()">Cancel</button>
-				<button type="button" class="btn btn-primary" id="save-device-btn">Save item</button>
-			</div>
-		</div>
-	</div>
--->
 
 <script>
 	const defaultImageUrl = '/images/device-placeholder.svg'
@@ -129,6 +68,70 @@
 	let deviceStatusesLoaded = false
 	let pendingModalCategory = ''
 	let pendingModalStatus = ''
+
+	async function loadInventoryFilters() {
+		const categoryFilter = document.getElementById('inventory-category-filter')
+		const statusFilter = document.getElementById('inventory-status-filter')
+		if (!categoryFilter || !statusFilter) return
+
+		try {
+			const [categoryResponse, statusResponse] = await Promise.all([
+				fetch('/api/items/device-categories'),
+				fetch('/api/items/device-statuses'),
+			])
+
+			if (!categoryResponse.ok || !statusResponse.ok) {
+				throw new Error('Unable to load inventory filters.')
+			}
+
+			const [{ deviceCategories }, { deviceStatuses }] = await Promise.all([
+				categoryResponse.json(),
+				statusResponse.json(),
+			])
+
+			const categoryOptions = deviceCategories
+				.map((category) => `<option value="${category.name}">${category.name}</option>`)
+				.join('')
+			const statusOptions = deviceStatuses
+				.map((status) => `<option value="${status.name}">${status.name}</option>`)
+				.join('')
+
+			categoryFilter.innerHTML = `<option value="">All categories</option>${categoryOptions}`
+			statusFilter.innerHTML = `<option value="">All statuses</option>${statusOptions}`
+		} catch (_error) {
+			categoryFilter.innerHTML = '<option value="">All categories</option>'
+			statusFilter.innerHTML = '<option value="">All statuses</option>'
+		}
+	}
+
+	function applyInventoryFilters() {
+		const query = document.getElementById('inventory-search-input')?.value.trim().toLowerCase() || ''
+		const categoryFilter = document.getElementById('inventory-category-filter')?.value || ''
+		const statusFilter = document.getElementById('inventory-status-filter')?.value || ''
+		const rows = Array.from(document.querySelectorAll('.inventory-row'))
+		let visibleRows = 0
+
+		rows.forEach((row) => {
+			const serial = row.dataset.serial || ''
+			const model = row.dataset.model || ''
+			const brand = row.dataset.brand || ''
+			const category = row.dataset.category || ''
+			const status = row.dataset.status || ''
+			const searchTarget = `${serial} ${model} ${brand} ${category} ${status}`.toLowerCase()
+			const matchesSearch = !query || searchTarget.includes(query)
+			const matchesCategory = !categoryFilter || category === categoryFilter
+			const matchesStatus = !statusFilter || status === statusFilter
+			const shouldShow = matchesSearch && matchesCategory && matchesStatus
+
+			row.style.display = shouldShow ? '' : 'none'
+			if (shouldShow) visibleRows += 1
+		})
+
+		const noResultsRow = document.getElementById('inventory-no-results-row')
+		if (noResultsRow) {
+			noResultsRow.style.display = visibleRows === 0 && rows.length > 0 ? '' : 'none'
+		}
+	}
 
 	async function loadDeviceCategories() {
 		const categorySelect = document.getElementById('new-category')
@@ -293,6 +296,10 @@
 		otherGroup.style.display = this.value === 'Other' ? 'block' : 'none'
 	})
 
+	document.getElementById('inventory-search-input')?.addEventListener('input', applyInventoryFilters)
+	document.getElementById('inventory-category-filter')?.addEventListener('change', applyInventoryFilters)
+	document.getElementById('inventory-status-filter')?.addEventListener('change', applyInventoryFilters)
+
 	document.getElementById('save-device-btn')?.addEventListener('click', async function () {
 		const serialNumber = document.getElementById('new-serial').value.trim()
 		const modelName = document.getElementById('new-model').value.trim()
@@ -408,5 +415,9 @@
 
 	document.getElementById('modal')?.addEventListener('click', function (e) {
 		if (e.target === this) closeModal()
+	})
+
+	loadInventoryFilters().finally(() => {
+		applyInventoryFilters()
 	})
 </script>
