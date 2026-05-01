@@ -12,11 +12,17 @@ export const renderTransactions = async (_req, res) => {
 			getActiveUsers(),
 			getActiveCheckouts(),
 		])
+		const stats = {
+			available: availableDevices.length,
+			checkedOut: activeCheckouts.length,
+			activeUsers: users.length,
+		}
 		res.render('transactions/index', {
 			title: 'Check-in / Out',
 			availableDevices,
 			users,
 			activeCheckouts,
+			stats,
 		})
 	} catch (err) {
 		res.status(500).render('error', { message: 'Failed to load transactions', error: err.message })

@@ -3,11 +3,13 @@ import { getUsers, getUserById, getUserRoles } from '../models/userModel.js'
 export const renderUsers = async (req, res) => {
 	try {
 		const users = await getUsers()
+		const active = users.filter((u) => u.status === 'active').length
+		const stats = { total: users.length, active, inactive: users.length - active }
 		let flash = null
 		if (req.query.created) flash = { type: 'success', message: 'User created successfully.' }
 		else if (req.query.updated) flash = { type: 'success', message: 'User updated successfully.' }
 		else if (req.query.deleted) flash = { type: 'warning', message: 'User deleted.' }
-		res.render('users/index', { title: 'Users', users, flash })
+		res.render('users/index', { title: 'Users', users, stats, flash })
 	} catch (err) {
 		res.status(500).render('error', { message: 'Failed to load users', error: err.message })
 	}
