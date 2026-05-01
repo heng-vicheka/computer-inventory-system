@@ -1,21 +1,12 @@
-import crypto from 'crypto'
-import bcrypt from 'bcrypt'
-import nodemailer from 'nodemailer'
-import { and, eq } from 'drizzle-orm'
+import bcrypt from 'bcryptjs'
+import { eq } from 'drizzle-orm'
 import { authenticateUser, getAuthCookieOptions, issueAuthToken } from '../utils/auth.js'
 import { getCookieValue } from '../utils/cookies.js'
 import { verifyJwt } from '../utils/jwt.js'
 import { db } from '../db/db.js'
+import { client } from '../db/db.js'
 import { userRoles, users } from '../db/schema.js'
 
-// Email transporter setup
-const transporter = nodemailer.createTransport({
-	service: process.env.EMAIL_SERVICE || 'gmail',
-	auth: {
-		user: process.env.EMAIL_USER,
-		pass: process.env.EMAIL_PASSWORD,
-	},
-})
 
 // Validate password requirements
 function validatePassword(password) {
@@ -161,12 +152,7 @@ export async function handleSignup(req, res) {
 			})
 		}
 
-		// Hash password
 		const hashedPassword = await bcrypt.hash(password, 10)
-
-		// Generate verification token
-		const verificationToken = crypto.randomBytes(32).toString('hex')
-		const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
 
 		const roleId = await resolveRoleId(role)
 		if (!roleId) {
@@ -177,46 +163,14 @@ export async function handleSignup(req, res) {
 			})
 		}
 
-		await db.insert(users).values({
-			name: deriveDisplayNameFromEmail(normalizedEmail),
-			email: normalizedEmail,
-			password: hashedPassword,
-			userRoleId: roleId,
-			passwordHash: hashedPassword,
-			status: 'pending_verification',
-			emailVerified: false,
-			emailVerificationToken: verificationToken,
-			verificationTokenExpiry: tokenExpiry.toISOString(),
+		await client.execute({
+			sql: 'INSERT INTO users (name, email, user_role_id, password_hash, status) VALUES (?, ?, ?, ?, ?)',
+			args: [deriveDisplayNameFromEmail(normalizedEmail), normalizedEmail, roleId, hashedPassword, 'active'],
 		})
 
-		// Send verification email
-		const verificationUrl = `${process.env.APP_URL || 'http://localhost:3000'}/verify-email/${verificationToken}`
-
-		const mailOptions = {
-			from: process.env.EMAIL_USER,
-			to: normalizedEmail,
-			subject: 'Verify Your BitBin IT Inventory Account',
-			html: `
-        <h2>Welcome to BitBin IT Inventory</h2>
-        <p>Thank you for signing up! Please verify your email address by clicking the link below:</p>
-        <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #185FA5; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">
-          Verify Email
-        </a>
-        <p>Or copy and paste this link:</p>
-        <p>${verificationUrl}</p>
-        <p>This link will expire in 24 hours.</p>
-        <p>If you didn't create this account, please ignore this email.</p>
-      `,
-		}
-
-		// Send email
-		await transporter.sendMail(mailOptions)
-
-		// Show success message and redirect to login
 		return res.render('signup', {
 			layout: 'auth',
-			successMessage:
-				'Account created! Check your email to verify your account. You will be redirected to login in 3 seconds.',
+			successMessage: 'Account created! You will be redirected to login in 3 seconds.',
 			title: 'Sign Up',
 		})
 	} catch {
@@ -328,7 +282,8 @@ export async function handleLogin(req, res) {
 		res.cookie('role', user.role, cookieOptions)
 
 		return res.redirect('/')
-	} catch {
+	} catch (err) {
+		console.error('[login error]', err)
 		return res.render('login', {
 			layout: 'auth',
 			title: 'Login',
