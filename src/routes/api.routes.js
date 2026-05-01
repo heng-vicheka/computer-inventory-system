@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
 	getItems,
 	createDevice,
+	updateDevice,
 	deleteDevice,
 	getDeviceCategories,
 	getDeviceStatuses,
@@ -34,7 +35,7 @@ apiRouter.get('/items/device-statuses', getDeviceStatuses)
 apiRouter.get('/items', getItems)
 apiRouter.get('/items/:id/history', notImplemented)
 apiRouter.post('/items', createDevice)
-apiRouter.put('/items/:id', notImplemented)
+apiRouter.put('/items/:id', updateDevice)
 apiRouter.delete('/items/:id', deleteDevice)
 
 apiRouter.post('/transactions/checkout', notImplemented)

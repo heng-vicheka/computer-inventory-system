@@ -47,7 +47,7 @@
 						<td>{{formatDate dateAcquired}}</td>
 						<td>
 							<div class="action-buttons">
-								<button class="btn btn-secondary btn-sm">Edit</button>
+								<button class="btn btn-secondary btn-sm edit-device-btn" data-id="{{id}}" data-serial="{{serialNumber}}" data-model="{{modelName}}" data-brand="{{brand}}" data-category="{{category}}" data-status="{{status}}" data-date="{{dateAcquired}}" data-picture-url="{{pictureUrl}}">Edit</button>
 								<button type="button" class="btn btn-danger btn-sm delete-device-btn" data-id="{{id}}">Delete</button>
 							</div>
 						</td>
@@ -61,9 +61,9 @@
 		</tbody>
 	</table>
 	</div>
-	<div class="modal-overlay" id="modal">
-		<div class="modal">
-			<div class="modal-header">
+	{{> item-form}}
+
+<script></script><!--
 				<span style="font-size: 14px; font-weight: 500">Add new item</span>
 				<span class="modal-close" onclick="closeModal()">&#x2715;</span>
 			</div>
@@ -116,13 +116,19 @@
 			</div>
 		</div>
 	</div>
+-->
 
 <script>
 	const defaultImageUrl = '/images/device-placeholder.svg'
 	let selectedDeviceImage = ''
 	let selectedDeviceImageFile = null
+	let currentDevicePictureUrl = ''
+	let editingDeviceId = null
+	let isEditMode = false
 	let deviceCategoriesLoaded = false
 	let deviceStatusesLoaded = false
+	let pendingModalCategory = ''
+	let pendingModalStatus = ''
 
 	async function loadDeviceCategories() {
 		const categorySelect = document.getElementById('new-category')
@@ -137,6 +143,11 @@
 				.join('')
 			categorySelect.innerHTML = `<option value="">Select category</option>${options}<option value="Other">Other</option>`
 			deviceCategoriesLoaded = true
+			if (pendingModalCategory) {
+				categorySelect.value = pendingModalCategory
+				document.getElementById('new-category-other-group').style.display =
+					pendingModalCategory === 'Other' ? 'block' : 'none'
+			}
 		} catch (error) {
 			categorySelect.innerHTML =
 				'<option value="">Failed to load categories</option><option value="Other">Other</option>'
@@ -156,20 +167,83 @@
 				.join('')
 			statusSelect.innerHTML = `<option value="">Select status</option>${options}<option value="Other">Other</option>`
 			deviceStatusesLoaded = true
+			if (pendingModalStatus) {
+				statusSelect.value = pendingModalStatus
+				document.getElementById('new-status-other-group').style.display =
+					pendingModalStatus === 'Other' ? 'block' : 'none'
+			}
 		} catch (error) {
 			statusSelect.innerHTML =
 				'<option value="">Failed to load statuses</option><option value="Other">Other</option>'
 		}
 	}
 
-	function openModal() {
+	function setFormMode(editMode) {
+		const modalTitle = document.getElementById('modalTitle')
+		const saveButton = document.getElementById('save-device-btn')
+		if (modalTitle) modalTitle.textContent = editMode ? 'Edit item' : 'Add new item'
+		if (saveButton) saveButton.textContent = editMode ? 'Update item' : 'Save item'
+		isEditMode = editMode
+	}
+
+	function openModal(editDevice = null) {
 		resetNewDeviceForm()
+		setFormMode(!!editDevice)
 		document.getElementById('modal').classList.add('open')
+
 		if (!deviceCategoriesLoaded) {
 			loadDeviceCategories()
+		} else if (pendingModalCategory) {
+			const categorySelect = document.getElementById('new-category')
+			if (categorySelect) {
+				categorySelect.value = pendingModalCategory
+				document.getElementById('new-category-other-group').style.display =
+					pendingModalCategory === 'Other' ? 'block' : 'none'
+			}
 		}
+
 		if (!deviceStatusesLoaded) {
 			loadDeviceStatuses()
+		} else if (pendingModalStatus) {
+			const statusSelect = document.getElementById('new-status')
+			if (statusSelect) {
+				statusSelect.value = pendingModalStatus
+				document.getElementById('new-status-other-group').style.display =
+					pendingModalStatus === 'Other' ? 'block' : 'none'
+			}
+		}
+
+		if (editDevice) {
+			editingDeviceId = editDevice.id
+			currentDevicePictureUrl = editDevice.pictureUrl || ''
+			document.getElementById('device-id').value = editDevice.id
+			document.getElementById('new-serial').value = editDevice.serialNumber || ''
+			document.getElementById('new-model').value = editDevice.modelName || ''
+			document.getElementById('new-brand').value = editDevice.brand || ''
+			document.getElementById('new-acquired').value = editDevice.dateAcquired || ''
+			pendingModalCategory = editDevice.category || ''
+			pendingModalStatus = editDevice.status || ''
+			if (deviceCategoriesLoaded) {
+				const categorySelect = document.getElementById('new-category')
+				if (categorySelect) {
+					categorySelect.value = pendingModalCategory
+					document.getElementById('new-category-other-group').style.display =
+						pendingModalCategory === 'Other' ? 'block' : 'none'
+				}
+			}
+			if (deviceStatusesLoaded) {
+				const statusSelect = document.getElementById('new-status')
+				if (statusSelect) {
+					statusSelect.value = pendingModalStatus
+					document.getElementById('new-status-other-group').style.display =
+						pendingModalStatus === 'Other' ? 'block' : 'none'
+				}
+			}
+			const preview = document.getElementById('device-image-preview')
+			if (preview && currentDevicePictureUrl) {
+				preview.src = currentDevicePictureUrl
+				preview.hidden = false
+			}
 		}
 	}
 
@@ -187,8 +261,13 @@
 		document.getElementById('new-status-other').value = ''
 		document.getElementById('new-acquired').value = ''
 		document.getElementById('device-image-input').value = ''
+		document.getElementById('device-id').value = ''
 		selectedDeviceImage = ''
 		selectedDeviceImageFile = null
+		currentDevicePictureUrl = ''
+		editingDeviceId = null
+		pendingModalCategory = ''
+		pendingModalStatus = ''
 		const preview = document.getElementById('device-image-preview')
 		preview.hidden = true
 		preview.src = ''
@@ -245,7 +324,7 @@
 			return
 		}
 
-		let pictureUrl = ''
+		let pictureUrl = currentDevicePictureUrl || ''
 		if (selectedDeviceImageFile && selectedDeviceImage) {
 			const uploadResponse = await fetch('/api/items/upload', {
 				method: 'POST',
@@ -280,8 +359,9 @@
 		}
 
 		try {
-			const response = await fetch('/api/items', {
-				method: 'POST',
+			const endpoint = isEditMode ? `/api/items/${editingDeviceId}` : '/api/items'
+			const response = await fetch(endpoint, {
+				method: isEditMode ? 'PUT' : 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -301,6 +381,22 @@
 	})
 
 	document.addEventListener('click', async function (e) {
+		const editButton = e.target.closest('.edit-device-btn')
+		if (editButton) {
+			const device = {
+				id: editButton.dataset.id,
+				serialNumber: editButton.dataset.serial,
+				modelName: editButton.dataset.model,
+				brand: editButton.dataset.brand,
+				category: editButton.dataset.category,
+				status: editButton.dataset.status,
+				dateAcquired: editButton.dataset.date,
+				pictureUrl: editButton.dataset.pictureUrl,
+			}
+			openModal(device)
+			return
+		}
+
 		const deleteButton = e.target.closest('.delete-device-btn')
 		if (!deleteButton) return
 
@@ -324,6 +420,7 @@
 			alert(error.message)
 		}
 	})
+
 	document.getElementById('modal')?.addEventListener('click', function (e) {
 		if (e.target === this) closeModal()
 	})
