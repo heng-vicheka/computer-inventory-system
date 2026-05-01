@@ -474,6 +474,14 @@ tr:last-child td {
 	background: #e3e3e3;
 	border: 1px solid rgba(0, 0, 0, 0.3);
 }
+.btn-accent {
+	color: #777777;
+}
+.btn-accent:hover {
+	color: black;
+	background: #e3e3e3;
+	border: 1px solid rgba(0, 0, 0, 0.3);
+}
 
 tr:hover td {
 	background: #f5f5f3;
