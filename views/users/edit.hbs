@@ -1,0 +1,76 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+	<div>
+		<h5 class="fw-semibold mb-0">Edit User</h5>
+		<small class="text-muted">{{user.name}}</small>
+	</div>
+	<a href="/users" class="btn btn-outline-secondary btn-sm">
+		<i class="bi bi-arrow-left me-1"></i>Back to Users
+	</a>
+</div>
+
+{{> flash}}
+
+{{#if errors}}
+<div class="alert alert-danger">
+	<strong>Please fix the following:</strong>
+	<ul class="mb-0 mt-1">
+		{{#each errors}}<li>{{this}}</li>{{/each}}
+	</ul>
+</div>
+{{/if}}
+
+<div class="card border-0 shadow-sm" style="max-width:560px">
+	<div class="card-body p-4">
+		<form method="POST" action="/users/{{user.id}}">
+			<div class="mb-3">
+				<label class="form-label fw-medium">Full Name</label>
+				<input type="text" name="name" class="form-control" value="{{user.name}}" required />
+			</div>
+
+			<div class="mb-3">
+				<label class="form-label fw-medium">Email Address</label>
+				<input type="email" name="email" class="form-control" value="{{user.email}}" required />
+			</div>
+
+			<div class="mb-3">
+				<label class="form-label fw-medium">Role</label>
+				<select name="userRoleId" class="form-select" required>
+					<option value="">Select role…</option>
+					{{#each roles}}
+					<option value="{{this.id}}" {{#if (eq this.id ../user.user_role_id)}}selected{{/if}}>{{this.name}}</option>
+					{{/each}}
+				</select>
+			</div>
+
+			<div class="mb-4">
+				<label class="form-label fw-medium">Status</label>
+				<select name="status" class="form-select" required>
+					<option value="active"   {{#if (eq user.status 'active')}}selected{{/if}}>Active</option>
+					<option value="inactive" {{#if (eq user.status 'inactive')}}selected{{/if}}>Inactive</option>
+				</select>
+			</div>
+
+			<div class="d-flex gap-2">
+				<button type="submit" class="btn btn-primary">
+					<i class="bi bi-check2 me-1"></i>Save Changes
+				</button>
+				<a href="/users" class="btn btn-outline-secondary">Cancel</a>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div class="mt-4" style="max-width:560px">
+	<div class="card border-danger border-opacity-25">
+		<div class="card-body">
+			<h6 class="text-danger mb-1">Danger Zone</h6>
+			<p class="text-muted small mb-3">Deleting a user is a soft delete — their data is preserved but the account is deactivated.</p>
+			<form method="POST" action="/users/{{user.id}}/delete"
+				  onsubmit="return confirm('Delete {{user.name}}? This will deactivate their account.')">
+				<button type="submit" class="btn btn-outline-danger btn-sm">
+					<i class="bi bi-trash me-1"></i>Delete User
+				</button>
+			</form>
+		</div>
+	</div>
+</div>
