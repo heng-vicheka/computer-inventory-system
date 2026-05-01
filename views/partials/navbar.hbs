@@ -1,40 +1,35 @@
 <nav class="sidebar">
-    <div class="sidebar-header">💻 IT Inventory</div>
-    <ul>
-        <li class="nav-item {{#if (eq currentPath '/dashboard')}}active{{/if}}">
-            <a href="/dashboard" class="nav-link">
-                <span class="nav-icon">■</span> Dashboard
-            </a>
-        </li>
-        <li class="nav-item {{#if (eq currentPath '/inventory')}}active{{/if}}">
-            <a href="/inventory" class="nav-link">
-                <span class="nav-icon">■</span> Inventory
-            </a>
-        </li>
-        <li class="nav-item {{#if (eq currentPath '/checkout')}}active{{/if}}">
-            <a href="/checkout" class="nav-link">
-                <span class="nav-icon">■</span> Check-in / Out
-            </a>
-        </li>
-        <li class="nav-item {{#if (eq currentPath '/history')}}active{{/if}}">
-            <a href="/history" class="nav-link">
-                <span class="nav-icon">■</span> Asset History
-            </a>
-        </li>
-        <li class="nav-item {{#if (eq currentPath '/users')}}active{{/if}}">
-            <a href="/users" class="nav-link">
-                <span class="nav-icon">■</span> Users
-            </a>
-        </li>
-        <li class="nav-item {{#if (eq currentPath '/apikeys')}}active{{/if}}">
-            <a href="/apikeys" class="nav-link">
-                <span class="nav-icon">■</span> API Keys
-            </a>
-        </li>
-        <li class="nav-item {{#if (eq currentPath '/reports')}}active{{/if}}">
-            <a href="/reports" class="nav-link">
-                <span class="nav-icon">■</span> Reports
-            </a>
-        </li>
-    </ul>
+	<div class="sidebar-logo">💻 IT Inventory</div>
+	<ul>
+		<li class="nav-item {{#if (eq currentPath '/dashboard')}}active{{/if}}">
+			<a href="/dashboard" class="nav-link"><span class="nav-icon">■</span> Dashboard</a>
+		</li>
+		<li class="nav-item {{#if (eq currentPath '/inventory')}}active{{/if}}">
+			<a href="/inventory" class="nav-link"><span class="nav-icon">■</span> Inventory</a>
+		</li>
+		<li class="nav-item {{#if (eq currentPath '/checkout')}}active{{/if}}">
+			<a href="/checkout" class="nav-link"><span class="nav-icon">■</span> Check-in / Out</a>
+		</li>
+		<li class="nav-item {{#if (eq currentPath '/history')}}active{{/if}}">
+			<a href="/history" class="nav-link"><span class="nav-icon">■</span> Asset History</a>
+		</li>
+		{{#if isAdmin}}
+		<li class="nav-item {{#if (eq currentPath '/users')}}active{{/if}}">
+			<a href="/users" class="nav-link"><span class="nav-icon">■</span> Users</a>
+		</li>
+		<li class="nav-item {{#if (eq currentPath '/apikeys')}}active{{/if}}">
+			<a href="/apikeys" class="nav-link"><span class="nav-icon">■</span> API Keys</a>
+		</li>
+		{{/if}}
+		<li class="nav-item {{#if (eq currentPath '/reports')}}active{{/if}}">
+			<a href="/reports" class="nav-link"><span class="nav-icon">■</span> Reports</a>
+		</li>
+		<li class="nav-item">
+			<form action="/logout" method="POST" style="display:inline;">
+				<button type="submit" class="nav-link" style="background:none;border:0;padding:0;cursor:pointer;">
+					<span class="nav-icon">■</span> Logout
+				</button>
+			</form>
+		</li>
+	</ul>
 </nav>

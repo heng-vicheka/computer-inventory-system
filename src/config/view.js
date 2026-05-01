@@ -44,20 +44,32 @@ function authMiddleware(req, res, next) {
 
 function viewLocalsMiddleware(req, res, next) {
 	const cookies = parseCookies(req.headers.cookie)
-	let userRole = cookies.role || 'Technician'
+	let userRole = 'Technician'
+	let userName = ''
 
 	try {
 		const token = cookies.auth_token
 		if (token) {
 			const payload = verifyJwt(token)
 			userRole = payload.role || userRole
+			userName = payload.name || ''
 		}
 	} catch {
-		// ignore invalid token and use fallback role value
+		// ignore invalid token
 	}
+
+	const initials = userName
+		.split(' ')
+		.filter(Boolean)
+		.slice(0, 2)
+		.map((w) => w[0].toUpperCase())
+		.join('') || 'U'
 
 	res.locals.currentPath = req.path
 	res.locals.userRole = userRole
+	res.locals.userName = userName
+	res.locals.userInitials = initials
+	res.locals.isAdmin = userRole === 'Admin'
 	next()
 }
 

@@ -1,61 +1,37 @@
-<div id="panel-dashboard" class="panel block">
-    <div class="stats-grid">
-        <div class="stat-card stat-total">
-            <div class="stat-label">Total assets</div>
-            <div class="stat-value">{{stats.total}}</div>
-        </div>
-        <div class="stat-card stat-available">
-            <div class="stat-label">Available</div>
-            <div class="stat-value">{{stats.available}}</div>
-        </div>
-        <div class="stat-card stat-inuse">
-            <div class="stat-label">In use</div>
-            <div class="stat-value">{{stats.inUse}}</div>
-        </div>
-        <div class="stat-card stat-maintenance">
-            <div class="stat-label">Maintenance</div>
-            <div class="stat-value">{{stats.maintenance}}</div>
-        </div>
-        <div class="stat-card stat-retired">
-            <div class="stat-label">Retired</div>
-            <div class="stat-value">{{stats.retired}}</div>
-        </div>
-    </div>
+<div class="stats">
+	<div class="stat-card">
+		<div class="stat-label">Total assets</div>
+		<div class="stat-val blue">{{stats.total}}</div>
+	</div>
+	<div class="stat-card">
+		<div class="stat-label">Available</div>
+		<div class="stat-val green">{{stats.available}}</div>
+	</div>
+	<div class="stat-card">
+		<div class="stat-label">In use</div>
+		<div class="stat-val amber">{{stats.inUse}}</div>
+	</div>
+	<div class="stat-card">
+		<div class="stat-label">Maintenance</div>
+		<div class="stat-val red">{{stats.maintenance}}</div>
+	</div>
+</div>
 
-    {{!-- Place Holder for real activity data or logs --}}
-    <div class="card recent-activity">
-        <div class="card-header">
-            <span>Recent activity</span>
-        </div>
-        <div class="card-body">
-            <div class="activity-row">
-                <div class="activity-dot bg-blue"></div>
-                <div>
-                    <div>Laptop Dell XPS 15 <strong>checked out</strong> to Maria Santos</div>
-                    <div class="muted">2 hours ago · by John Doe</div>
-                </div>
-            </div>
-            <div class="activity-row">
-                <div class="activity-dot bg-green"></div>
-                <div>
-                    <div>Monitor LG 27" <strong>checked in</strong> from Alex Cruz</div>
-                    <div class="muted">5 hours ago · by John Doe</div>
-                </div>
-            </div>
-            <div class="activity-row">
-                <div class="activity-dot bg-amber"></div>
-                <div>
-                    <div>Desktop HP EliteDesk set to <strong>Maintenance</strong></div>
-                    <div class="muted">Yesterday · by Jane Smith</div>
-                </div>
-            </div>
-            <div class="activity-row">
-                <div class="activity-dot bg-blue"></div>
-                <div>
-                    <div>MacBook Pro 14" <strong>checked out</strong> to Kevin Lim</div>
-                    <div class="muted">Yesterday · by John Doe</div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="section">
+	<div class="section-header">
+		<span class="section-title">Recent activity</span>
+	</div>
+	{{#if recentActivity.length}}
+		{{#each recentActivity}}
+			<div class="history-row">
+				<div class="history-dot {{dotClass}}"></div>
+				<div>
+					<div>{{description}}</div>
+					<div class="history-meta">{{date}}</div>
+				</div>
+			</div>
+		{{/each}}
+	{{else}}
+		<div class="empty">No recent activity.</div>
+	{{/if}}
 </div>

@@ -1,14 +1,10 @@
-import { getDashboardStats } from '../models/dashboard.model.js'
+import { getDashboardStats, getRecentActivity } from '../models/dashboard.model.js'
 
-export const renderDashboard = async (req, res) => {
+export const renderDashboard = async (_req, res) => {
 	try {
-		const stats = await getDashboardStats()
-		res.render('dashboard', { stats, title: 'Dashboard' })
+		const [stats, recentActivity] = await Promise.all([getDashboardStats(), getRecentActivity()])
+		res.render('dashboard', { stats, recentActivity, title: 'Dashboard' })
 	} catch (error) {
-		// console.error('Error rendering dashboard:', error)
-		res.status(500).render('error', {
-			message: 'Failed to load dashboard',
-			error: error.message,
-		})
+		res.status(500).render('error', { message: 'Failed to load dashboard', error: error.message })
 	}
 }

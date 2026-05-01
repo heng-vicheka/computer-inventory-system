@@ -1,47 +1,57 @@
 import { db } from '../db/db.js'
-import { devices, deviceStatuses } from '../db/schema.js'
-import { eq, count } from 'drizzle-orm'
+import { devices, deviceStatuses, history, users } from '../db/schema.js'
+import { eq, count, desc } from 'drizzle-orm'
 
 export const getDashboardStats = async () => {
-	try {
-		// Get total count of all devices
-		const totalDevices = await db.select({ count: count() }).from(devices)
+	const [{ total }] = await db.select({ total: count() }).from(devices).where(eq(devices.isDeleted, false))
 
-		// Get count of devices by status
-		const devicesByStatus = await db
-			.select({
-				statusName: deviceStatuses.name,
-				statusCount: count(),
-			})
-			.from(devices)
-			.innerJoin(deviceStatuses, eq(devices.deviceStatusId, deviceStatuses.id))
-			.groupBy(deviceStatuses.id, deviceStatuses.name)
+	const byStatus = await db
+		.select({ statusName: deviceStatuses.name, statusCount: count() })
+		.from(devices)
+		.innerJoin(deviceStatuses, eq(devices.deviceStatusId, deviceStatuses.id))
+		.where(eq(devices.isDeleted, false))
+		.groupBy(deviceStatuses.id, deviceStatuses.name)
 
-		// Format the response
-		const stats = {
-			total: totalDevices[0]?.count || 0,
-			available: 0,
-			inUse: 0,
-			maintenance: 0,
-			retired: 0,
-		}
+	const stats = { total, available: 0, inUse: 0, maintenance: 0, retired: 0 }
+	byStatus.forEach(({ statusName, statusCount }) => {
+		if (statusName === 'Available') stats.available = statusCount
+		else if (statusName === 'In-Use' || statusName === 'In Use') stats.inUse = statusCount
+		else if (statusName === 'Maintenance') stats.maintenance = statusCount
+		else if (statusName === 'Retired') stats.retired = statusCount
+	})
 
-		// Map status counts to the stats object
-		devicesByStatus.forEach((item) => {
-			if (item.statusName === 'Available') {
-				stats.available = item.statusCount
-			} else if (item.statusName === 'In-Use' || item.statusName === 'In Use') {
-				stats.inUse = item.statusCount
-			} else if (item.statusName === 'Maintenance') {
-				stats.maintenance = item.statusCount
-			} else if (item.statusName === 'Retired') {
-				stats.retired = item.statusCount
-			}
+	return stats
+}
+
+export const getRecentActivity = async (limit = 6) => {
+	const rows = await db
+		.select({
+			id: history.id,
+			userName: users.name,
+			serialNumber: devices.serialNumber,
+			modelName: devices.modelName,
+			dateCheckedIn: history.dateCheckedIn,
+			dateCheckedOut: history.dateCheckedOut,
 		})
+		.from(history)
+		.innerJoin(devices, eq(history.deviceId, devices.id))
+		.innerJoin(users, eq(history.userId, users.id))
+		.orderBy(desc(history.id))
+		.limit(limit)
 
-		return stats
-	} catch (error) {
-		// console.error('Error fetching dashboard stats:', error)
-		throw new Error(error.message, { cause: error })
-	}
+	return rows.map((r) => {
+		const hasReturn = !!r.dateCheckedOut
+		const date = hasReturn
+			? r.dateCheckedOut.split('T')[0]
+			: r.dateCheckedIn.split('T')[0]
+		const label = r.modelName ? `${r.serialNumber} (${r.modelName})` : r.serialNumber
+
+		return {
+			description: hasReturn
+				? `${label} checked in from ${r.userName}`
+				: `${label} checked out to ${r.userName}`,
+			date,
+			dotClass: hasReturn ? 'green' : '',
+		}
+	})
 }

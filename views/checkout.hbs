@@ -1,0 +1,93 @@
+<div class="checkout-grid">
+	<!-- Check Out -->
+	<div class="section">
+		<div class="section-header">
+			<span class="section-title">Check out an item</span>
+		</div>
+		<div class="form-grid form-grid-1">
+			<div class="form-group">
+				<label>Item (serial #)</label>
+				<select id="checkout-device">
+					<option value="">Select available item...</option>
+					{{#each availableDevices}}
+						<option value="{{id}}">{{serialNumber}}{{#if modelName}} — {{modelName}}{{/if}}</option>
+					{{else}}
+						<option disabled>No available items</option>
+					{{/each}}
+				</select>
+			</div>
+			<div class="form-group">
+				<label>Assign to user</label>
+				<select id="checkout-user">
+					<option value="">Select user...</option>
+					{{#each allUsers}}
+						<option value="{{id}}">{{name}}</option>
+					{{/each}}
+				</select>
+			</div>
+		</div>
+		<div class="form-actions">
+			<button class="btn btn-primary" onclick="submitCheckout()">Check out</button>
+		</div>
+	</div>
+
+	<!-- Check In -->
+	<div class="section">
+		<div class="section-header">
+			<span class="section-title">Check in an item</span>
+		</div>
+		<div class="form-grid form-grid-1">
+			<div class="form-group">
+				<label>Item (serial #)</label>
+				<select id="checkin-device">
+					<option value="">Select item to return...</option>
+					{{#each inUseDevices}}
+						<option value="{{id}}">{{serialNumber}}{{#if modelName}} — {{modelName}}{{/if}}</option>
+					{{else}}
+						<option disabled>No items currently checked out</option>
+					{{/each}}
+				</select>
+			</div>
+		</div>
+		<div class="form-actions">
+			<button class="btn btn-primary" onclick="submitCheckin()">Check in</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	async function submitCheckout() {
+		const deviceId = document.getElementById('checkout-device').value
+		const userId = document.getElementById('checkout-user').value
+		if (!deviceId || !userId) return alert('Please select both an item and a user.')
+		try {
+			const res = await fetch('/api/transactions/checkout', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ deviceId, userId }),
+			})
+			const data = await res.json()
+			if (!res.ok) throw new Error(data.message)
+			location.reload()
+		} catch (err) {
+			alert(err.message)
+		}
+	}
+
+	async function submitCheckin() {
+		const deviceId = document.getElementById('checkin-device').value
+		if (!deviceId) return alert('Please select an item to check in.')
+		try {
+			const res = await fetch('/api/transactions/checkin', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ deviceId }),
+			})
+			const data = await res.json()
+			if (!res.ok) throw new Error(data.message)
+			location.reload()
+		} catch (err) {
+			alert(err.message)
+		}
+	}
+</script>
