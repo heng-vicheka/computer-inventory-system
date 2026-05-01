@@ -19,6 +19,8 @@ export const users = sqliteTable('users', {
 	userRoleId: integer('user_role_id')
 		.notNull()
 		.references(() => userRoles.id),
+	passwordHash: text('password_hash').notNull(),
+	apiKeyHash: text('api_key_hash'),
 
 	status: text('status').notNull(),
 	profilePictureUrl: text('profile_picture_url'),

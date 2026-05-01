@@ -28,7 +28,10 @@
 		"prepare": "lefthook install",
 		"precommit": "lefthook run pre-commit",
 		"prepush": "lefthook run pre-push",
-		"update:latest": "npm i pnpm@latest"
+		"update:latest": "npm i pnpm@latest",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:push": "drizzle-kit push"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.3",
