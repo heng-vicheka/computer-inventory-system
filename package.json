@@ -26,7 +26,7 @@
 		"format": "prettier --write .",
 		"seed": "node src/db/seed.js",
 		"seed:admin": "tsx src/db/seed-admin.js",
-		"prepare": "lefthook install",
+		"prepare": "test -d .git && lefthook install || true",
 		"precommit": "lefthook run pre-commit",
 		"prepush": "lefthook run pre-push",
 		"update:latest": "npm i pnpm@latest",
