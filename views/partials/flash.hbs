@@ -1,4 +1,6 @@
-{{!-- Flash message placeholder --}}
-{{#if message}}
-	<div class="alert alert-info">{{message}}</div>
+{{#if flash}}
+<div class="alert alert-{{flash.type}} alert-dismissible fade show mb-3" role="alert">
+	{{flash.message}}
+	<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
 {{/if}}
