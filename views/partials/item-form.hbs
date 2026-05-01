@@ -1,0 +1,51 @@
+<div class="modal-overlay" id="modal">
+	<div class="modal">
+		<input id="device-id" type="hidden" />
+		<div class="modal-header">
+			<span id="modalTitle" style="font-size: 14px; font-weight: 500">Add new item</span>
+			<span class="modal-close" onclick="closeModal()">&#x2715;</span>
+		</div>
+		<div class="form-grid">
+			<div class="form-group">
+				<label>Serial number</label><input id="new-serial" type="text" placeholder="SN-XXXX" />
+			</div>
+			<div class="form-group">
+				<label>Model</label><input id="new-model" type="text" placeholder="e.g. XPS 15" />
+			</div>
+			<div class="form-group">
+				<label>Brand</label><input id="new-brand" type="text" placeholder="e.g. Dell" />
+			</div>
+			<div class="form-group">
+				<label>Category</label><select id="new-category">
+					<option value="">Loading categories...</option>
+				</select>
+			</div>
+			<div class="form-group full" id="new-category-other-group" style="display: none;">
+				<div class="form-group">
+					<label>Other category</label>
+					<input id="new-category-other" type="text" placeholder="Specify a new category" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label>Status</label><select id="new-status">
+					<option value="">Loading statuses...</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label>Date acquired</label><input id="new-acquired" type="date" />
+			</div>
+			<div class="form-group full">
+				<label>Device image</label>
+				<div class="image-input">
+					<label class="btn" for="device-image-input">Select image</label>
+					<input id="device-image-input" type="file" accept="image/*" />
+					<img id="device-image-preview" class="image-preview" src="" alt="Device preview" hidden />
+				</div>
+			</div>
+		</div>
+		<div class="form-actions">
+			<button type="button" class="btn" onclick="closeModal()">Cancel</button>
+			<button type="button" class="btn btn-primary" id="save-device-btn">Save item</button>
+		</div>
+	</div>
+</div>

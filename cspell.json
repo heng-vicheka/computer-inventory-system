@@ -15,8 +15,9 @@
 		"topbar",
 		"turso",
 		"TURSO",
-		"vicheka",
-		"inuse"
+		"inuse",
+		"Uploadthing",
+		"vicheka"
 	],
 	"ignorePaths": [
 		"cspell.json",
@@ -25,6 +26,7 @@
 		"pnpm-workspace.yaml",
 		"package-lock.json",
 		"package.json",
+		"public",
 		"dist",
 		"build",
 		"*.log",

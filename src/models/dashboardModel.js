@@ -30,7 +30,7 @@ export const getDashboardStats = async () => {
 		devicesByStatus.forEach((item) => {
 			if (item.statusName === 'Available') {
 				stats.available = item.statusCount
-			} else if (item.statusName === 'In Use') {
+			} else if (item.statusName === 'In-Use' || item.statusName === 'In Use') {
 				stats.inUse = item.statusCount
 			} else if (item.statusName === 'Maintenance') {
 				stats.maintenance = item.statusCount

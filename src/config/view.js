@@ -50,12 +50,13 @@ app.engine(
 app.set('view engine', 'hbs')
 app.set('views', join(__dirname, '..', '..', 'views'))
 
+// ─── Request locals for template rendering ─────────────────────────────────
+app.use((req, res, next) => {
+	res.locals.currentPath = req.path
+	next()
+})
+
 // ─── Static Assets (for CSS/JS used by views) ───────────────────────────────
 app.use(express.static(join(__dirname, '..', '..', 'public')))
-
-// ─── Routes ──────────────────────────────────────────────────────────────────
-app.get('/', (_req, res) => {
-	res.render('home')
-})
 
 export default app
