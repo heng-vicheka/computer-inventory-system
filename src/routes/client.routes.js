@@ -1,8 +1,11 @@
 import { Router } from 'express'
 import { renderDashboard } from '../controllers/dashboardController.js'
 import { getInventory } from '../controllers/inventory.controller.js'
+import authRouter from './authRoutes.js'
 
 const clientRouter = Router()
+
+clientRouter.use('/', authRouter)
 
 // ─── Dashboard Routes ──────────────────────────────────────────────────────────────────
 clientRouter.get('/', (req, res) => {
