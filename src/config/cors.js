@@ -1,6 +1,6 @@
 import cors from 'cors'
 
-const appOrigin = process.env.APP_ORIGIN ?? 'http://localhost:3000'
+const appOrigin = process.env.APP_ORIGIN ?? 'http://localhost:4000'
 
 const corsOptions = {
 	origin(origin, callback) {

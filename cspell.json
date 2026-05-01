@@ -15,6 +15,7 @@
 		"topbar",
 		"turso",
 		"TURSO",
+		"Uploadthing",
 		"vicheka"
 	],
 	"ignorePaths": [
@@ -24,6 +25,7 @@
 		"pnpm-workspace.yaml",
 		"package-lock.json",
 		"package.json",
+		"public",
 		"dist",
 		"build",
 		"*.log",

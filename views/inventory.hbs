@@ -1,0 +1,412 @@
+<div class="section">
+	<div class="section-header">
+		<span class="section-title">All items</span>
+		<div class="search-bar">
+			<input type="text" placeholder="Search..." />
+			<select>
+				<option>All categories</option>
+				<option>Laptop</option>
+				<option>Desktop</option>
+				<option>Monitor</option>
+				<option>Keyboard</option>
+				<option>Server</option>
+			</select>
+			<select>
+				<option>All statuses</option>
+				<option>Available</option>
+				<option>In-Use</option>
+				<option>Maintenance</option>
+				<option>Retired</option>
+			</select>
+				<button type="button" class="btn btn-primary" onclick="openModal()">+ Add item</button>
+		</div>
+	</div>
+	<table>
+		<thead>
+			<tr>
+				<th>Serial #</th>
+				<th></th>
+				<th>Model</th>
+				<th>Brand</th>
+				<th>Category</th>
+				<th>Status</th>
+				<th>Acquired</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#if devices.length}}
+				{{#each devices}}
+					<tr>
+						<td>{{serialNumber}}</td>
+						<td><img class="table-thumb" src="{{pictureUrl}}" alt="{{modelName}}" /></td>
+						<td>{{modelName}}</td>
+						<td>{{brand}}</td>
+						<td>{{category}}</td>
+						<td><span class="badge {{statusClass}}">{{status}}</span></td>
+						<td>{{formatDate dateAcquired}}</td>
+						<td>
+							<div class="action-buttons">
+								<button class="btn btn-secondary btn-sm edit-device-btn" data-id="{{id}}" data-serial="{{serialNumber}}" data-model="{{modelName}}" data-brand="{{brand}}" data-category="{{category}}" data-status="{{status}}" data-date="{{dateAcquired}}" data-picture-url="{{pictureUrl}}">Edit</button>
+								<button type="button" class="btn btn-danger btn-sm delete-device-btn" data-id="{{id}}">Delete</button>
+							</div>
+						</td>
+					</tr>
+				{{/each}}
+			{{else}}
+				<tr>
+					<td colspan="8" class="empty">No inventory items found.</td>
+				</tr>
+			{{/if}}
+		</tbody>
+	</table>
+	</div>
+	{{> item-form}}
+
+<script></script><!--
+				<span style="font-size: 14px; font-weight: 500">Add new item</span>
+				<span class="modal-close" onclick="closeModal()">&#x2715;</span>
+			</div>
+			<div class="form-grid">
+				<div class="form-group">
+					<label>Serial number</label><input id="new-serial" type="text" placeholder="SN-XXXX" />
+				</div>
+				<div class="form-group">
+					<label>Model</label><input id="new-model" type="text" placeholder="e.g. XPS 15" />
+				</div>
+				<div class="form-group">
+					<label>Brand</label><input id="new-brand" type="text" placeholder="e.g. Dell" />
+				</div>
+				<div class="form-group">
+					<label>Category</label><select id="new-category">
+						<option value="">Loading categories...</option>
+				</select>
+			</div>
+			<div class="form-group full" id="new-category-other-group" style="display: none;">
+				<div class="form-group">
+					<label>Other category</label>
+					<input id="new-category-other" type="text" placeholder="Specify a new category" />
+				</div>
+				</div>
+				<div class="form-group">
+					<label>Status</label><select id="new-status">
+						<option value="">Loading statuses...</option>
+								</select>
+				</div>			<div class="form-group full" id="new-status-other-group" style="display: none;">
+					<div class="form-group">
+				<label>Other status</label>
+				<input id="new-status-other" type="text" placeholder="Specify a new status" />
+				</div>
+			</div>				
+				<div class="form-group">
+					<label>Date acquired</label><input id="new-acquired" type="date" />
+				</div>
+				<div class="form-group full">
+					<label>Device image</label>
+					<div class="image-input">
+						<label class="btn" for="device-image-input">Select image</label>
+						<input id="device-image-input" type="file" accept="image/*" />
+						<img id="device-image-preview" class="image-preview" src="" alt="Device preview" hidden />
+					</div>
+				</div>
+			</div>
+			<div class="form-actions">
+				<button type="button" class="btn" onclick="closeModal()">Cancel</button>
+				<button type="button" class="btn btn-primary" id="save-device-btn">Save item</button>
+			</div>
+		</div>
+	</div>
+-->
+
+<script>
+	const defaultImageUrl = '/images/device-placeholder.svg'
+	let selectedDeviceImage = ''
+	let selectedDeviceImageFile = null
+	let currentDevicePictureUrl = ''
+	let editingDeviceId = null
+	let isEditMode = false
+	let deviceCategoriesLoaded = false
+	let deviceStatusesLoaded = false
+	let pendingModalCategory = ''
+	let pendingModalStatus = ''
+
+	async function loadDeviceCategories() {
+		const categorySelect = document.getElementById('new-category')
+		if (!categorySelect) return
+
+		try {
+			const response = await fetch('/api/items/device-categories')
+			if (!response.ok) throw new Error('Unable to load categories.')
+			const data = await response.json()
+			const options = data.deviceCategories
+				.map((category) => `<option value="${category.name}">${category.name}</option>`)
+				.join('')
+			categorySelect.innerHTML = `<option value="">Select category</option>${options}<option value="Other">Other</option>`
+			deviceCategoriesLoaded = true
+			if (pendingModalCategory) {
+				categorySelect.value = pendingModalCategory
+				document.getElementById('new-category-other-group').style.display =
+					pendingModalCategory === 'Other' ? 'block' : 'none'
+			}
+		} catch (error) {
+			categorySelect.innerHTML =
+				'<option value="">Failed to load categories</option><option value="Other">Other</option>'
+		}
+	}
+
+	async function loadDeviceStatuses() {
+		const statusSelect = document.getElementById('new-status')
+		if (!statusSelect) return
+
+		try {
+			const response = await fetch('/api/items/device-statuses')
+			if (!response.ok) throw new Error('Unable to load statuses.')
+			const data = await response.json()
+			const options = data.deviceStatuses
+				.map((status) => `<option value="${status.name}">${status.name}</option>`)
+				.join('')
+			statusSelect.innerHTML = `<option value="">Select status</option>${options}`
+			deviceStatusesLoaded = true
+			if (pendingModalStatus) {
+				statusSelect.value = pendingModalStatus
+			}
+		} catch (error) {
+			statusSelect.innerHTML = '<option value="">Failed to load statuses</option>'
+		}
+	}
+
+	function setFormMode(editMode) {
+		const modalTitle = document.getElementById('modalTitle')
+		const saveButton = document.getElementById('save-device-btn')
+		if (modalTitle) modalTitle.textContent = editMode ? 'Edit item' : 'Add new item'
+		if (saveButton) saveButton.textContent = editMode ? 'Update item' : 'Save item'
+		isEditMode = editMode
+	}
+
+	function openModal(editDevice = null) {
+		resetNewDeviceForm()
+		setFormMode(!!editDevice)
+		document.getElementById('modal').classList.add('open')
+
+		if (!deviceCategoriesLoaded) {
+			loadDeviceCategories()
+		} else if (pendingModalCategory) {
+			const categorySelect = document.getElementById('new-category')
+			if (categorySelect) {
+				categorySelect.value = pendingModalCategory
+				document.getElementById('new-category-other-group').style.display =
+					pendingModalCategory === 'Other' ? 'block' : 'none'
+			}
+		}
+
+		if (!deviceStatusesLoaded) {
+			loadDeviceStatuses()
+		} else if (pendingModalStatus) {
+			const statusSelect = document.getElementById('new-status')
+			if (statusSelect) {
+				statusSelect.value = pendingModalStatus
+			}
+		}
+
+		if (editDevice) {
+			editingDeviceId = editDevice.id
+			currentDevicePictureUrl = editDevice.pictureUrl || ''
+			document.getElementById('device-id').value = editDevice.id
+			document.getElementById('new-serial').value = editDevice.serialNumber || ''
+			document.getElementById('new-model').value = editDevice.modelName || ''
+			document.getElementById('new-brand').value = editDevice.brand || ''
+			document.getElementById('new-acquired').value = editDevice.dateAcquired || ''
+			pendingModalCategory = editDevice.category || ''
+			pendingModalStatus = editDevice.status || ''
+			if (deviceCategoriesLoaded) {
+				const categorySelect = document.getElementById('new-category')
+				if (categorySelect) {
+					categorySelect.value = pendingModalCategory
+					document.getElementById('new-category-other-group').style.display =
+						pendingModalCategory === 'Other' ? 'block' : 'none'
+				}
+			}
+			if (deviceStatusesLoaded) {
+				const statusSelect = document.getElementById('new-status')
+				if (statusSelect) {
+					statusSelect.value = pendingModalStatus
+				}
+			}
+			const preview = document.getElementById('device-image-preview')
+			if (preview && currentDevicePictureUrl) {
+				preview.src = currentDevicePictureUrl
+				preview.hidden = false
+			}
+		}
+	}
+
+	function closeModal() {
+		document.getElementById('modal').classList.remove('open')
+	}
+
+	function resetNewDeviceForm() {
+		document.getElementById('new-serial').value = ''
+		document.getElementById('new-model').value = ''
+		document.getElementById('new-brand').value = ''
+		document.getElementById('new-category').value = ''
+		document.getElementById('new-category-other').value = ''
+		document.getElementById('new-status').value = ''
+		document.getElementById('new-acquired').value = ''
+		document.getElementById('device-image-input').value = ''
+		document.getElementById('device-id').value = ''
+		selectedDeviceImage = ''
+		selectedDeviceImageFile = null
+		currentDevicePictureUrl = ''
+		editingDeviceId = null
+		pendingModalCategory = ''
+		pendingModalStatus = ''
+		const preview = document.getElementById('device-image-preview')
+		preview.hidden = true
+		preview.src = ''
+		document.getElementById('new-category-other-group').style.display = 'none'
+	}
+
+	document.getElementById('device-image-input')?.addEventListener('change', function () {
+		const preview = document.getElementById('device-image-preview')
+		const file = this.files && this.files[0]
+
+		if (!file) {
+			selectedDeviceImage = ''
+			selectedDeviceImageFile = null
+			preview.hidden = true
+			preview.src = ''
+			return
+		}
+
+		selectedDeviceImageFile = file
+		const reader = new FileReader()
+		reader.onload = function (event) {
+			selectedDeviceImage = event.target.result
+			preview.src = selectedDeviceImage
+			preview.hidden = false
+		}
+		reader.readAsDataURL(file)
+	})
+
+	document.getElementById('new-category')?.addEventListener('change', function () {
+		const otherGroup = document.getElementById('new-category-other-group')
+		otherGroup.style.display = this.value === 'Other' ? 'block' : 'none'
+	})
+
+	document.getElementById('save-device-btn')?.addEventListener('click', async function () {
+		const serialNumber = document.getElementById('new-serial').value.trim()
+		const modelName = document.getElementById('new-model').value.trim()
+		const brand = document.getElementById('new-brand').value.trim()
+		const categorySelect = document.getElementById('new-category')
+		const customCategory = document.getElementById('new-category-other').value.trim()
+		const statusSelect = document.getElementById('new-status')
+		const dateAcquired = document.getElementById('new-acquired').value
+		const chosenCategory = categorySelect?.value === 'Other' ? customCategory : categorySelect?.value
+		const chosenStatus = statusSelect?.value
+
+		if (!serialNumber || !modelName || !brand || !chosenCategory || !chosenStatus) {
+			alert('Please fill in serial number, model, brand, category, and status before saving.')
+			return
+		}
+
+		let pictureUrl = currentDevicePictureUrl || ''
+		if (selectedDeviceImageFile && selectedDeviceImage) {
+			const uploadResponse = await fetch('/api/items/upload', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					fileName: selectedDeviceImageFile.name,
+					mimeType: selectedDeviceImageFile.type,
+					dataUrl: selectedDeviceImage,
+				}),
+			})
+
+			if (!uploadResponse.ok) {
+				const error = await uploadResponse.json().catch(() => null)
+				throw new Error(error?.message || 'Unable to upload image.')
+			}
+
+			const uploadData = await uploadResponse.json()
+			pictureUrl = uploadData.url || ''
+		}
+
+		const payload = {
+			serialNumber,
+			modelName,
+			brand,
+			type: chosenCategory,
+			category: chosenCategory,
+			status: chosenStatus,
+			dateAcquired,
+			pictureUrl,
+		}
+
+		try {
+			const endpoint = isEditMode ? `/api/items/${editingDeviceId}` : '/api/items'
+			const response = await fetch(endpoint, {
+				method: isEditMode ? 'PUT' : 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(payload),
+			})
+
+			if (!response.ok) {
+				const error = await response.json().catch(() => null)
+				throw new Error(error?.message || 'Unable to save device.')
+			}
+
+			closeModal()
+			window.location.reload()
+		} catch (error) {
+			alert(error.message)
+		}
+	})
+
+	document.addEventListener('click', async function (e) {
+		const editButton = e.target.closest('.edit-device-btn')
+		if (editButton) {
+			const device = {
+				id: editButton.dataset.id,
+				serialNumber: editButton.dataset.serial,
+				modelName: editButton.dataset.model,
+				brand: editButton.dataset.brand,
+				category: editButton.dataset.category,
+				status: editButton.dataset.status,
+				dateAcquired: editButton.dataset.date,
+				pictureUrl: editButton.dataset.pictureUrl,
+			}
+			openModal(device)
+			return
+		}
+
+		const deleteButton = e.target.closest('.delete-device-btn')
+		if (!deleteButton) return
+
+		const deviceId = deleteButton.dataset.id
+		if (!deviceId) return
+
+		if (!confirm('Are you sure you want to delete this device?')) return
+
+		try {
+			const response = await fetch(`/api/items/${deviceId}`, {
+				method: 'DELETE',
+			})
+
+			if (!response.ok) {
+				const error = await response.json().catch(() => null)
+				throw new Error(error?.message || 'Unable to delete device.')
+			}
+
+			window.location.reload()
+		} catch (error) {
+			alert(error.message)
+		}
+	})
+
+	document.getElementById('modal')?.addEventListener('click', function (e) {
+		if (e.target === this) closeModal()
+	})
+</script>
