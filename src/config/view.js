@@ -2,28 +2,30 @@ import express from 'express'
 import { engine } from 'express-handlebars'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { getCookieValue, parseCookies } from '../utils/cookies.js'
+import { verifyJwt } from '../utils/jwt.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const app = express()
 
-function parseCookies(cookieHeader) {
-	if (!cookieHeader) return {}
-	return Object.fromEntries(
-		cookieHeader
-			.split(';')
-			.map((cookie) => cookie.trim().split('='))
-			.map(([name, value]) => [name, decodeURIComponent(value || '')]),
-	)
-}
-
 function isAuthenticated(req) {
-	const cookies = parseCookies(req.headers.cookie)
-	return cookies.auth === '1'
+	try {
+		const token = getCookieValue(req.headers.cookie, 'auth_token')
+		if (!token) return false
+		verifyJwt(token)
+		return true
+	} catch {
+		return false
+	}
 }
 
 function authMiddleware(req, res, next) {
+	if (req.path.startsWith('/api')) {
+		return next()
+	}
+
 	if (
 		req.path === '/login' ||
 		req.path === '/logout' ||
@@ -38,6 +40,25 @@ function authMiddleware(req, res, next) {
 	}
 
 	return next()
+}
+
+function viewLocalsMiddleware(req, res, next) {
+	const cookies = parseCookies(req.headers.cookie)
+	let userRole = cookies.role || 'Technician'
+
+	try {
+		const token = cookies.auth_token
+		if (token) {
+			const payload = verifyJwt(token)
+			userRole = payload.role || userRole
+		}
+	} catch {
+		// ignore invalid token and use fallback role value
+	}
+
+	res.locals.currentPath = req.path
+	res.locals.userRole = userRole
+	next()
 }
 
 // ─── View Engine ─────────────────────────────────────────────────────────────
@@ -85,6 +106,7 @@ app.set('views', join(__dirname, '..', '..', 'views'))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(join(__dirname, '..', '..', 'public')))
 app.use(authMiddleware)
+app.use(viewLocalsMiddleware)
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
 
