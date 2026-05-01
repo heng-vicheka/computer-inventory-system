@@ -1,0 +1,96 @@
+<div class="stats stats-3">
+	<div class="stat-card">
+		<div class="stat-label">Total assets</div>
+		<div class="stat-val blue">{{stats.total}}</div>
+	</div>
+	<div class="stat-card">
+		<div class="stat-label">Deployed</div>
+		<div class="stat-val amber">{{stats.deployed}}</div>
+	</div>
+	<div class="stat-card">
+		<div class="stat-label">Assets &gt; 3 years old</div>
+		<div class="stat-val red">{{stats.aging}}</div>
+	</div>
+</div>
+
+<div class="section">
+	<div class="section-header">
+		<span class="section-title">Aging assets (&gt; 3 years)</span>
+	</div>
+	<table>
+		<thead>
+			<tr>
+				<th>Serial #</th>
+				<th>Model</th>
+				<th>Brand</th>
+				<th>Acquired</th>
+				<th>Age</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each agingAssets}}
+				<tr>
+					<td>{{serialNumber}}</td>
+					<td>{{modelName}}</td>
+					<td>{{brandName}}</td>
+					<td>{{dateAcquired}}</td>
+					<td>{{ageLabel}}</td>
+					<td><span class="badge {{statusClass}}">{{statusName}}</span></td>
+				</tr>
+			{{else}}
+				<tr><td colspan="6" class="empty">No aging assets found.</td></tr>
+			{{/each}}
+		</tbody>
+	</table>
+</div>
+
+<div class="section">
+	<div class="section-header">
+		<span class="section-title">User audit</span>
+		<div class="search-bar">
+			<select id="audit-user-select">
+				<option value="">Select user...</option>
+				{{#each allUsers}}
+					<option value="{{id}}">{{name}}</option>
+				{{/each}}
+			</select>
+			<button class="btn" onclick="runUserAudit()">Run</button>
+		</div>
+	</div>
+	<table>
+		<thead>
+			<tr><th>Serial #</th><th>Model</th><th>Checked out</th></tr>
+		</thead>
+		<tbody id="audit-table-body">
+			<tr><td colspan="3" class="empty">Select a user to view their assigned assets.</td></tr>
+		</tbody>
+	</table>
+</div>
+
+<script>
+	async function runUserAudit() {
+		const userId = document.getElementById('audit-user-select').value
+		const tbody = document.getElementById('audit-table-body')
+		if (!userId) return
+
+		tbody.innerHTML = '<tr><td colspan="3" class="empty">Loading...</td></tr>'
+		try {
+			const res = await fetch(`/api/reports/user-assets?userId=${userId}`)
+			const { assets } = await res.json()
+			if (!assets.length) {
+				tbody.innerHTML = '<tr><td colspan="3" class="empty">No assets currently assigned to this user.</td></tr>'
+				return
+			}
+			tbody.innerHTML = assets.map((a) => `
+				<tr>
+					<td>${a.serialNumber}</td>
+					<td>${a.modelName || '—'}</td>
+					<td>${a.dateCheckedIn ? a.dateCheckedIn.split('T')[0] : '—'}</td>
+				</tr>
+			`).join('')
+		} catch {
+			tbody.innerHTML = '<tr><td colspan="3" class="empty">Failed to load assets.</td></tr>'
+		}
+	}
+</script>

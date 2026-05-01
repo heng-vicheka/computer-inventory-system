@@ -1,7 +1,11 @@
 <div class="topbar">
-	<div class="page-title" id="page-title">{{title}}</div>
-	<div class="topbar-actions">
-		<span class="badge-admin">{{userRole}}</span>
-		<div class="avatar">JD</div>
+	<div class="topbar-title">{{title}}</div>
+	<div class="topbar-right">
+		{{#if isAdmin}}
+			<span class="badge badge-admin">Admin</span>
+		{{else}}
+			<span class="badge badge-tech">{{userRole}}</span>
+		{{/if}}
+		<div class="avatar">{{userInitials}}</div>
 	</div>
 </div>
