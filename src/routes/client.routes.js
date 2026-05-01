@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { renderHistory } from '../controllers/historyController.js'
 import { renderApiKeys } from '../controllers/apiKey.controller.js'
 import { renderDashboard } from '../controllers/dashboard.controller.js'
 import { getInventory } from '../controllers/inventory.controller.js'
@@ -14,6 +15,9 @@ clientRouter.get('/', (req, res) => {
 })
 
 clientRouter.get('/dashboard', renderDashboard)
+
+// ─── History Routes ──────────────────────────────────────────────────────────────────
+clientRouter.get('/history', renderHistory)
 
 // ─── Api Key Routes ──────────────────────────────────────────────────────────────────
 clientRouter.get('/apikeys', renderApiKeys)

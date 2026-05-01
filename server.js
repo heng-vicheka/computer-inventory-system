@@ -24,5 +24,5 @@ app.use('/', authRoutes)
 app.use('/', homeRoutes)
 
 app.listen(port, () => {
-	console.debug(`Server running at http://localhost:${port}`)
+	console.log(`Server running at http://localhost:${port}`)
 })
