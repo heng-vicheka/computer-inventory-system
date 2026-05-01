@@ -6,16 +6,50 @@
 				<i class="bi bi-x-lg"></i>
 			</button>
 		</div>
-		<form action="/apikeys" method="post">
+		<form action="/api/keys" method="post" data-api-key-form>
 			<div class="form-grid api-key-form-grid">
 				<label class="form-field form-field-full">
 					<span>Label</span>
 					<input type="text" name="label" placeholder="Production integration" required />
 				</label>
+				<div class="api-key-created form-field-full" hidden data-api-key-created>
+					<div class="api-key-note">Copy this key now. It will not be shown again.</div>
+					<div class="key-preview-control">
+						<input
+							class="api-key-preview"
+							type="text"
+							value=""
+							readonly
+							data-created-key-preview
+							data-hidden-value="**********"
+							data-full-value=""
+							aria-label="Generated API key"
+						/>
+						<button
+							class="icon-button key-copy"
+							type="button"
+							aria-label="Copy generated API key"
+							title="Copy generated API key"
+							data-created-key-copy
+						>
+							<i class="bi bi-copy"></i>
+						</button>
+						<button
+							class="icon-button key-toggle"
+							type="button"
+							aria-label="Hide generated API key"
+							title="Hide generated API key"
+							data-created-key-toggle
+						>
+							<i class="bi bi-eye-slash"></i>
+						</button>
+					</div>
+				</div>
 			</div>
 			<div class="form-actions">
-				<button class="btn" type="button" data-api-key-close>Cancel</button>
-				<button class="btn btn-primary" type="submit">Generate key</button>
+				<button class="btn" type="button" data-api-key-cancel>Cancel</button>
+				<button class="btn btn-primary" type="submit" data-api-key-submit>Generate key</button>
+				<button class="btn btn-primary" type="button" hidden data-api-key-done>Done</button>
 			</div>
 		</form>
 	</div>

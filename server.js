@@ -21,5 +21,5 @@ app.use('/', clientRouter)
 const port = process.env.PORT
 
 app.listen(port, () => {
-	// console.debug(`Server running at http://localhost:${port}`)
+	console.debug(`Server running at http://localhost:${port}`)
 })

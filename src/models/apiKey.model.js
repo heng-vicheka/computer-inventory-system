@@ -3,53 +3,6 @@ import { desc, eq } from 'drizzle-orm'
 import { db } from '../db/db.js'
 import { apiKeys } from '../db/schema.js'
 
-function toDateOnly(value) {
-	if (!value) return '-'
-	const date = new Date(value)
-	if (Number.isNaN(date.getTime())) return String(value).slice(0, 10)
-	return date.toISOString().slice(0, 10)
-}
-
-function maskedKey(value) {
-	if (!value) return '********'
-	if (value.length <= 12) return `${value.slice(0, 4)}********`
-	return `${value.slice(0, 8)}.....${value.slice(-6)}`
-}
-
-function buildStats(rows) {
-	const active = rows.filter((key) => key.status === true && key.isDeleted !== true).length
-	const revoked = rows.filter((key) => key.status === false || key.isDeleted === true).length
-
-	return {
-		total: rows.length,
-		active,
-		revoked,
-	}
-}
-
-export async function getApiKeyPageData() {
-	const rows = await getApiKeys()
-	const keys = rows.map((key) => {
-		const revoked = key.status === false || key.isDeleted === true
-
-		return {
-			id: key.id,
-			label: key.label,
-			keyHash: key.keyHash,
-			keyPreview: maskedKey(key.keyHash),
-			createdAt: toDateOnly(key.dateCreated),
-			status: revoked ? 'Revoked' : 'Active',
-			statusClass: revoked ? 'danger' : 'success',
-			isRevoked: revoked,
-		}
-	})
-
-	return {
-		apiKeys: keys,
-		stats: buildStats(rows),
-	}
-}
-
 export async function createApiKey(_req, label) {
 	const cleanLabel = String(label || '').trim()
 	if (!cleanLabel) {
@@ -70,6 +23,12 @@ export async function createApiKey(_req, label) {
 		.returning({ id: apiKeys.id })
 	if (!createdKey?.id) {
 		throw new Error('Failed to create API key.')
+	}
+
+	return {
+		id: createdKey.id,
+		label: cleanLabel,
+		secret,
 	}
 }
 
@@ -101,12 +60,11 @@ export async function revokeApiKey(_req, id) {
 		.where(eq(apiKeys.id, keyId))
 }
 
-async function getApiKeys() {
+export async function getApiKeys() {
 	return db
 		.select({
 			id: apiKeys.id,
 			label: apiKeys.label,
-			keyHash: apiKeys.keyHash,
 			status: apiKeys.status,
 			isDeleted: apiKeys.isDeleted,
 			dateCreated: apiKeys.dateCreated,

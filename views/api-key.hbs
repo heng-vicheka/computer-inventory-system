@@ -36,36 +36,7 @@
 							<tr>
 								<td>{{label}}</td>
 								<td>
-									<div class="key-preview-control">
-										<input
-											class="api-key-preview"
-											type="text"
-											value="{{keyPreview}}"
-											readonly
-											data-key-preview
-											data-hidden-value="{{keyPreview}}"
-											data-full-value="{{keyHash}}"
-											aria-label="Key hash preview"
-										/>
-										<button
-											class="icon-button key-copy"
-											type="button"
-											aria-label="Copy key hash"
-											title="Copy key hash"
-											data-key-copy
-										>
-											<i class="bi bi-copy"></i>
-										</button>
-										<button
-											class="icon-button key-toggle"
-											type="button"
-											aria-label="Show key hash"
-											title="Show key hash"
-											data-key-toggle
-										>
-											<i class="bi bi-eye"></i>
-										</button>
-									</div>
+									<span class="api-key-preview-static">{{keyPreview}}</span>
 								</td>
 								<td>{{createdAt}}</td>
 								<td>
@@ -75,9 +46,9 @@
 									{{#if isRevoked}}
 										<span class="api-key-revoked-action">Revoked</span>
 									{{else}}
-										<form action="/apikeys/{{id}}/revoke" method="post">
-											<button class="btn btn-secondary btn-revoke" type="submit">Revoke</button>
-										</form>
+										<button class="btn btn-secondary btn-revoke" type="button" data-key-revoke="{{id}}">
+											Revoke
+										</button>
 									{{/if}}
 								</td>
 							</tr>
@@ -98,65 +69,170 @@
 <script>
 	const apiKeyModal = document.getElementById('apiKeyModal')
 	const openApiKeyModal = document.getElementById('openApiKeyModal')
+	const apiKeyForm = document.querySelector('[data-api-key-form]')
+	const apiKeyCreated = document.querySelector('[data-api-key-created]')
+	const apiKeyCreatedPreview = document.querySelector('[data-created-key-preview]')
+	const apiKeySubmit = document.querySelector('[data-api-key-submit]')
+	const apiKeyDone = document.querySelector('[data-api-key-done]')
+	const apiKeyCancel = document.querySelector('[data-api-key-cancel]')
+	const apiKeyClose = document.querySelector('[data-api-key-close]')
 
 	function closeApiKeyModal() {
 		apiKeyModal?.classList.remove('open')
 		apiKeyModal?.setAttribute('aria-hidden', 'true')
 	}
 
+	function resetApiKeyModal() {
+		apiKeyForm?.reset()
+		apiKeyForm?.querySelector('input[name="label"]')?.removeAttribute('readonly')
+		apiKeyCreated?.setAttribute('hidden', '')
+		apiKeySubmit?.removeAttribute('hidden')
+		apiKeySubmit?.removeAttribute('disabled')
+		apiKeyDone?.setAttribute('hidden', '')
+		apiKeyCancel?.removeAttribute('hidden')
+		apiKeyClose?.removeAttribute('hidden')
+
+		if (apiKeyCreatedPreview) {
+			apiKeyCreatedPreview.value = ''
+			apiKeyCreatedPreview.dataset.fullValue = ''
+		}
+	}
+
+	function copyText(value, button, copiedLabel, defaultLabel) {
+		if (!value) return
+
+		const showCopied = () => {
+			button.innerHTML = '<i class="bi bi-check-lg"></i>'
+			button.setAttribute('aria-label', copiedLabel)
+			button.setAttribute('title', copiedLabel)
+			window.setTimeout(() => {
+				button.innerHTML = '<i class="bi bi-copy"></i>'
+				button.setAttribute('aria-label', defaultLabel)
+				button.setAttribute('title', defaultLabel)
+			}, 1200)
+		}
+
+		if (navigator.clipboard) {
+			navigator.clipboard.writeText(value).then(showCopied).catch(() => fallbackCopy(value, showCopied))
+			return
+		}
+
+		fallbackCopy(value, showCopied)
+	}
+
+	function fallbackCopy(value, onCopied) {
+		const textArea = document.createElement('textarea')
+		textArea.value = value
+		textArea.setAttribute('readonly', '')
+		textArea.style.position = 'fixed'
+		textArea.style.opacity = '0'
+		document.body.appendChild(textArea)
+		textArea.select()
+		document.execCommand('copy')
+		textArea.remove()
+		onCopied()
+	}
+
 	openApiKeyModal?.addEventListener('click', () => {
+		resetApiKeyModal()
 		apiKeyModal?.classList.add('open')
 		apiKeyModal?.setAttribute('aria-hidden', 'false')
 		apiKeyModal?.querySelector('input[name="label"]')?.focus()
 	})
 
 	document.querySelectorAll('[data-api-key-close]').forEach((button) => {
-		button.addEventListener('click', closeApiKeyModal)
-	})
-
-	apiKeyModal?.addEventListener('click', (event) => {
-		if (event.target === apiKeyModal) closeApiKeyModal()
-	})
-
-	document.querySelectorAll('[data-key-toggle]').forEach((button) => {
 		button.addEventListener('click', () => {
-			const preview = button.closest('.key-preview-control')?.querySelector('[data-key-preview]')
-			if (!preview) return
-
-			const isHidden = preview.value === preview.dataset.hiddenValue
-			preview.value = isHidden ? preview.dataset.fullValue : preview.dataset.hiddenValue
-			button.setAttribute('aria-label', isHidden ? 'Hide key hash' : 'Show key hash')
-			button.setAttribute('title', isHidden ? 'Hide key hash' : 'Show key hash')
-			button.innerHTML = isHidden ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>'
+			resetApiKeyModal()
+			closeApiKeyModal()
 		})
 	})
 
-	document.querySelectorAll('[data-key-copy]').forEach((button) => {
-		button.addEventListener('click', async () => {
-			const preview = button.closest('.key-preview-control')?.querySelector('[data-key-preview]')
-			const value = preview?.dataset.fullValue
-			if (!value) return
+	apiKeyCancel?.addEventListener('click', () => {
+		resetApiKeyModal()
+		closeApiKeyModal()
+	})
 
+	apiKeyModal?.addEventListener('click', (event) => {
+		if (event.target !== apiKeyModal || !apiKeyDone?.hasAttribute('hidden')) return
+		resetApiKeyModal()
+		closeApiKeyModal()
+	})
+
+	apiKeyForm?.addEventListener('submit', async (event) => {
+		event.preventDefault()
+
+		apiKeySubmit.disabled = true
+		try {
+			const response = await fetch(apiKeyForm.action, {
+				method: 'POST',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					label: apiKeyForm.querySelector('input[name="label"]')?.value,
+				}),
+			})
+			const payload = await response.json()
+			if (!response.ok) throw new Error(payload.error || payload.message || 'Failed to generate API key')
+
+			const createdKey = payload.apiKey?.key
+			if (!createdKey) throw new Error('Generated API key was missing from the response')
+
+			apiKeyCreatedPreview.value = createdKey
+			apiKeyCreatedPreview.dataset.fullValue = createdKey
+			apiKeyForm.querySelector('input[name="label"]')?.setAttribute('readonly', '')
+			apiKeyCreated?.removeAttribute('hidden')
+			apiKeySubmit.setAttribute('hidden', '')
+			apiKeyCancel?.setAttribute('hidden', '')
+			apiKeyClose?.setAttribute('hidden', '')
+			apiKeyDone?.removeAttribute('hidden')
+		} catch (error) {
+			apiKeySubmit.disabled = false
+			window.alert(error.message || 'Failed to generate API key')
+		}
+	})
+
+	document.querySelector('[data-created-key-toggle]')?.addEventListener('click', (event) => {
+		const button = event.currentTarget
+		if (!apiKeyCreatedPreview) return
+
+		const isHidden = apiKeyCreatedPreview.value === apiKeyCreatedPreview.dataset.hiddenValue
+		apiKeyCreatedPreview.value = isHidden
+			? apiKeyCreatedPreview.dataset.fullValue
+			: apiKeyCreatedPreview.dataset.hiddenValue
+		button.setAttribute('aria-label', isHidden ? 'Hide generated API key' : 'Show generated API key')
+		button.setAttribute('title', isHidden ? 'Hide generated API key' : 'Show generated API key')
+		button.innerHTML = isHidden ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>'
+	})
+
+	document.querySelector('[data-created-key-copy]')?.addEventListener('click', (event) => {
+		copyText(
+			apiKeyCreatedPreview?.dataset.fullValue,
+			event.currentTarget,
+			'Copied generated API key',
+			'Copy generated API key',
+		)
+	})
+
+	apiKeyDone?.addEventListener('click', () => {
+		closeApiKeyModal()
+		window.location.reload()
+	})
+
+	document.querySelectorAll('[data-key-revoke]').forEach((button) => {
+		button.addEventListener('click', async () => {
+			const keyId = button.dataset.keyRevoke
+			if (!keyId) return
+
+			button.disabled = true
 			try {
-				await navigator.clipboard.writeText(value)
-				button.innerHTML = '<i class="bi bi-check-lg"></i>'
-				button.setAttribute('aria-label', 'Copied key hash')
-				button.setAttribute('title', 'Copied key hash')
-				window.setTimeout(() => {
-					button.innerHTML = '<i class="bi bi-copy"></i>'
-					button.setAttribute('aria-label', 'Copy key hash')
-					button.setAttribute('title', 'Copy key hash')
-				}, 1200)
+				const response = await fetch(`/api/keys/${keyId}`, { method: 'DELETE' })
+				if (!response.ok) throw new Error('Failed to revoke API key')
+				window.location.reload()
 			} catch (_error) {
-				const textArea = document.createElement('textarea')
-				textArea.value = value
-				textArea.setAttribute('readonly', '')
-				textArea.style.position = 'fixed'
-				textArea.style.opacity = '0'
-				document.body.appendChild(textArea)
-				textArea.select()
-				document.execCommand('copy')
-				textArea.remove()
+				button.disabled = false
+				window.alert('Failed to revoke API key')
 			}
 		})
 	})

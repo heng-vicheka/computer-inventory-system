@@ -59,12 +59,12 @@ Scan basis: current files in this branch.
 
 ### 4.3 API Key Management (Admin Only)
 
-- [ ] Admin UI page exists for API key generation.
-- [ ] API key generation creates unique key values.
-- [ ] API keys are hashed in database.
-- [ ] Raw API key is shown only once at creation.
-- [ ] Admin can list active API keys.
-- [ ] Admin can revoke/delete API keys immediately.
+- [x] Admin UI page exists for API key generation.
+- [x] API key generation creates unique key values.
+- [x] API keys are hashed in database.
+- [x] Raw API key is shown only once at creation.
+- [x] Admin can list active API keys.
+- [x] Admin can revoke/delete API keys immediately.
 
 ### 4.4 Check-in / Check-out System
 

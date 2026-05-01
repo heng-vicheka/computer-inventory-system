@@ -486,20 +486,9 @@ tr:last-child td {
 	font-size: 13px;
 	table-layout: fixed;
 }
-.api-key-table th:nth-child(1) {
-	width: 18%;
-}
-.api-key-table th:nth-child(2) {
-	width: auto;
-}
-.api-key-table th:nth-child(3) {
-	width: 120px;
-}
-.api-key-table th:nth-child(4) {
-	width: 110px;
-}
-.api-key-table th:nth-child(5) {
-	width: 120px;
+.api-key-table th,
+.api-key-table td {
+	width: 20%;
 }
 .api-key-table th,
 .api-key-table td {
@@ -534,6 +523,11 @@ tr:last-child td {
 	border-color: rgba(55, 138, 221, 0.7);
 	box-shadow: 0 0 0 2px rgba(55, 138, 221, 0.12);
 	outline: 0;
+}
+.api-key-preview-static {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+	font-size: 12px;
+	color: #666;
 }
 .key-preview-control {
 	display: flex;

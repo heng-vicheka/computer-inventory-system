@@ -8,6 +8,7 @@ import {
 	getDeviceStatuses,
 } from '../controllers/inventory.controller.js'
 import { uploadImage } from '../controllers/upload.controller.js'
+import { generateApiKey, listApiKeys, revokeApiKeyById } from '../controllers/apiKey.controller.js'
 
 const apiRouter = Router()
 
@@ -25,9 +26,9 @@ apiRouter.post('/users', notImplemented)
 apiRouter.patch('/users/:id/role', notImplemented)
 apiRouter.patch('/users/:id/status', notImplemented)
 
-apiRouter.post('/keys', notImplemented)
-apiRouter.get('/keys', notImplemented)
-apiRouter.delete('/keys/:id', notImplemented)
+apiRouter.post('/keys', generateApiKey)
+apiRouter.get('/keys', listApiKeys)
+apiRouter.delete('/keys/:id', revokeApiKeyById)
 
 apiRouter.post('/items/upload', uploadImage)
 apiRouter.get('/items/device-categories', getDeviceCategories)
