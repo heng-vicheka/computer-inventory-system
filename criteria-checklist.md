@@ -2,7 +2,7 @@
 
 Use this checklist to track implementation progress against `criteria.md`.
 
-Scan date: 2026-04-29
+Scan date: 2026-05-01
 Scan basis: current files in this branch.
 
 ## 1) Project Overview
@@ -36,8 +36,8 @@ Scan basis: current files in this branch.
 
 ### 4.1 Inventory Management (CRUD)
 
-- [ ] Inventory items are manageable via HBS UI forms.
-- [ ] Inventory items are manageable via JSON API endpoints.
+- [x] Inventory items are manageable via HBS UI forms.
+- [x] Inventory items are manageable via JSON API endpoints.
 - [x] Item has unique Item ID.
 - [x] Item has Serial Number field.
 - [x] Item has Model field.
@@ -82,7 +82,7 @@ Scan basis: current files in this branch.
 
 ### 4.6 Reporting
 
-- [ ] Inventory status report shows total vs deployed assets.
+- [x] Inventory status report shows total vs deployed assets.
 - [ ] Asset aging report lists items older than 3 years.
 - [ ] User audit report shows assets currently associated with selected user.
 
@@ -136,6 +136,8 @@ Scan basis: current files in this branch.
 
 ## Notes From This Scan
 
+- Inventory CRUD is implemented in both UI and API (`/inventory`, `GET/POST/PUT/DELETE /api/items`), including soft delete for items.
+- Dashboard provides inventory status totals (including deployed/in-use count), but dedicated reporting endpoints/pages are still incomplete.
 - Rate limiting middleware exists, but current `.env` values do not match `20 req/min` (`RATE_LIMIT_MAX=100`, `RATE_LIMIT_WINDOW=15*60*1000`).
-- JWT auth, API key middleware, RBAC enforcement, and required API endpoints are not implemented yet in this branch.
+- JWT auth, API key middleware, RBAC enforcement, and most required auth-protected API behavior are not implemented in this branch.
 - Criteria asks for MongoDB + Mongoose, but this branch currently uses Turso/SQLite via Drizzle.

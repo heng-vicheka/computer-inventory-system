@@ -165,16 +165,13 @@
 			const options = data.deviceStatuses
 				.map((status) => `<option value="${status.name}">${status.name}</option>`)
 				.join('')
-			statusSelect.innerHTML = `<option value="">Select status</option>${options}<option value="Other">Other</option>`
+			statusSelect.innerHTML = `<option value="">Select status</option>${options}`
 			deviceStatusesLoaded = true
 			if (pendingModalStatus) {
 				statusSelect.value = pendingModalStatus
-				document.getElementById('new-status-other-group').style.display =
-					pendingModalStatus === 'Other' ? 'block' : 'none'
 			}
 		} catch (error) {
-			statusSelect.innerHTML =
-				'<option value="">Failed to load statuses</option><option value="Other">Other</option>'
+			statusSelect.innerHTML = '<option value="">Failed to load statuses</option>'
 		}
 	}
 
@@ -208,8 +205,6 @@
 			const statusSelect = document.getElementById('new-status')
 			if (statusSelect) {
 				statusSelect.value = pendingModalStatus
-				document.getElementById('new-status-other-group').style.display =
-					pendingModalStatus === 'Other' ? 'block' : 'none'
 			}
 		}
 
@@ -235,8 +230,6 @@
 				const statusSelect = document.getElementById('new-status')
 				if (statusSelect) {
 					statusSelect.value = pendingModalStatus
-					document.getElementById('new-status-other-group').style.display =
-						pendingModalStatus === 'Other' ? 'block' : 'none'
 				}
 			}
 			const preview = document.getElementById('device-image-preview')
@@ -258,7 +251,6 @@
 		document.getElementById('new-category').value = ''
 		document.getElementById('new-category-other').value = ''
 		document.getElementById('new-status').value = ''
-		document.getElementById('new-status-other').value = ''
 		document.getElementById('new-acquired').value = ''
 		document.getElementById('device-image-input').value = ''
 		document.getElementById('device-id').value = ''
@@ -272,7 +264,6 @@
 		preview.hidden = true
 		preview.src = ''
 		document.getElementById('new-category-other-group').style.display = 'none'
-		document.getElementById('new-status-other-group').style.display = 'none'
 	}
 
 	document.getElementById('device-image-input')?.addEventListener('change', function () {
@@ -302,11 +293,6 @@
 		otherGroup.style.display = this.value === 'Other' ? 'block' : 'none'
 	})
 
-	document.getElementById('new-status')?.addEventListener('change', function () {
-		const otherGroup = document.getElementById('new-status-other-group')
-		otherGroup.style.display = this.value === 'Other' ? 'block' : 'none'
-	})
-
 	document.getElementById('save-device-btn')?.addEventListener('click', async function () {
 		const serialNumber = document.getElementById('new-serial').value.trim()
 		const modelName = document.getElementById('new-model').value.trim()
@@ -314,10 +300,9 @@
 		const categorySelect = document.getElementById('new-category')
 		const customCategory = document.getElementById('new-category-other').value.trim()
 		const statusSelect = document.getElementById('new-status')
-		const customStatus = document.getElementById('new-status-other').value.trim()
 		const dateAcquired = document.getElementById('new-acquired').value
 		const chosenCategory = categorySelect?.value === 'Other' ? customCategory : categorySelect?.value
-		const chosenStatus = statusSelect?.value === 'Other' ? customStatus : statusSelect?.value
+		const chosenStatus = statusSelect?.value
 
 		if (!serialNumber || !modelName || !brand || !chosenCategory || !chosenStatus) {
 			alert('Please fill in serial number, model, brand, category, and status before saving.')

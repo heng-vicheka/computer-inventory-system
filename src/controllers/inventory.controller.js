@@ -24,9 +24,19 @@ async function getOrCreateByName(table, value) {
 
 const statusClassMap = {
 	Available: 'badge-available',
-	'In Use': 'badge-inuse',
+	'In-Use': 'badge-inuse',
 	Maintenance: 'badge-maintenance',
 	Retired: 'badge-retired',
+	'In Use': 'badge-inuse',
+}
+
+const ALLOWED_STATUSES = new Set(['Available', 'In-Use', 'Maintenance', 'Retired'])
+
+function normalizeStatusValue(value) {
+	const raw = String(value || '').trim()
+	if (!raw) return ''
+	if (raw === 'In Use') return 'In-Use'
+	return raw
 }
 
 export const getInventory = async (_req, res) => {
@@ -136,7 +146,7 @@ export const createDevice = async (req, res) => {
 		const { serialNumber, modelName, brand, category, status, dateAcquired, pictureUrl } = req.body
 
 		const chosenCategory = String(category || '').trim()
-		const chosenStatus = String(status || '').trim()
+		const chosenStatus = normalizeStatusValue(status)
 		if (
 			!serialNumber?.trim() ||
 			!modelName?.trim() ||
@@ -149,10 +159,15 @@ export const createDevice = async (req, res) => {
 				.json({ message: 'Serial number, model, brand, category, and status are required.' })
 		}
 
-		const normalizedStatus = chosenStatus.trim().replaceAll('-', ' ')
+		if (!ALLOWED_STATUSES.has(chosenStatus)) {
+			return res.status(400).json({
+				message: 'Status must be one of: Available, In-Use, Maintenance, Retired.',
+			})
+		}
+
 		const typeId = await getOrCreateByName(deviceTypes, chosenCategory)
 		const brandId = await getOrCreateByName(deviceBrands, brand)
-		const statusId = await getOrCreateByName(deviceStatuses, normalizedStatus)
+		const statusId = await getOrCreateByName(deviceStatuses, chosenStatus)
 		const categoryId = await getOrCreateByName(deviceCategories, chosenCategory)
 
 		if (!typeId || !brandId || !statusId || !categoryId) {
@@ -185,7 +200,7 @@ export const updateDevice = async (req, res) => {
 
 		const { serialNumber, modelName, brand, category, status, dateAcquired, pictureUrl } = req.body
 		const chosenCategory = String(category || '').trim()
-		const chosenStatus = String(status || '').trim()
+		const chosenStatus = normalizeStatusValue(status)
 		if (
 			!serialNumber?.trim() ||
 			!modelName?.trim() ||
@@ -207,10 +222,15 @@ export const updateDevice = async (req, res) => {
 			return res.status(404).json({ message: 'Device not found.' })
 		}
 
-		const normalizedStatus = chosenStatus.trim().replaceAll('-', ' ')
+		if (!ALLOWED_STATUSES.has(chosenStatus)) {
+			return res.status(400).json({
+				message: 'Status must be one of: Available, In-Use, Maintenance, Retired.',
+			})
+		}
+
 		const typeId = await getOrCreateByName(deviceTypes, chosenCategory)
 		const brandId = await getOrCreateByName(deviceBrands, brand)
-		const statusId = await getOrCreateByName(deviceStatuses, normalizedStatus)
+		const statusId = await getOrCreateByName(deviceStatuses, chosenStatus)
 		const categoryId = await getOrCreateByName(deviceCategories, chosenCategory)
 
 		if (!typeId || !brandId || !statusId || !categoryId) {

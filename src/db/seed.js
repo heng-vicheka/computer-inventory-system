@@ -40,7 +40,7 @@ async function main() {
 
 	await db.insert(deviceStatuses).values([
 		{ id: 1, name: 'Available' },
-		{ id: 2, name: 'In Use' },
+		{ id: 2, name: 'In-Use' },
 		{ id: 3, name: 'Maintenance' },
 		{ id: 4, name: 'Retired' },
 	])
